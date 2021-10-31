@@ -1493,6 +1493,8 @@ public:
 
             if (is_essential) {
                 value_t birth = get_diameter(column_to_reduce);
+                /* Infinite birth means the bar is never born and should
+                 * not be included. */
                 bool is_born =
                     (birth != std::numeric_limits<value_t>::infinity());
                 if (is_born) {
