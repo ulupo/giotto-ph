@@ -988,34 +988,36 @@ public:
         value_t birth;
         diameter_index_t birth_vertex;
         for (auto e : edges) {
-            get_simplex_vertices(get_index(e), 1, n, vertices_of_edge.rbegin());
-            index_t v1 = vertices_of_edge[0];
-            index_t v2 = vertices_of_edge[1];
-            index_t u = dset.find(v1), v = dset.find(v2);
+            if (get_diameter(e) != std::numeric_limits<value_t>::infinity()) {
+                get_simplex_vertices(get_index(e), 1, n, vertices_of_edge.rbegin());
+                index_t v1 = vertices_of_edge[0];
+                index_t v2 = vertices_of_edge[1];
+                index_t u = dset.find(v1), v = dset.find(v2);
 
-            if (u != v) {
-                // link must be always done and now because we retrieve
-                // birth vertex value and index, it must be computed before
-                // the if condition
-                birth_vertex = dset.link_roots_and_get_birth_vertex(u, v);
-                if (get_diameter(e) != 0) {
-                    // Elder rule; youngest class (max birth time of u and v)
-                    // dies first
-                    birth = birth_vertex.first;
-                    value_t death = get_diameter(e);
-                    if (death > birth) {
-                        births_and_deaths_by_dim[0].push_back(birth);
-                        births_and_deaths_by_dim[0].push_back(death);
+                if (u != v) {
+                    // link must be always done and now because we retrieve
+                    // birth vertex value and index, it must be computed before
+                    // the if condition
+                    birth_vertex = dset.link_roots_and_get_birth_vertex(u, v);
+                    if (get_diameter(e) != 0) {
+                        // Elder rule; youngest class (max birth time of u and v)
+                        // dies first
+                        birth = birth_vertex.first;
+                        value_t death = get_diameter(e);
+                        if (death > birth) {
+                            births_and_deaths_by_dim[0].push_back(birth);
+                            births_and_deaths_by_dim[0].push_back(death);
 
-                        if (return_flag_persistence_generators) {
-                            flag_persistence_generators.finite_0.push_back(
-                                {birth_vertex.second, std::max(v1, v2),
-                                 std::min(v1, v2)});
+                            if (return_flag_persistence_generators) {
+                                flag_persistence_generators.finite_0.push_back(
+                                    {birth_vertex.second, std::max(v1, v2),
+                                     std::min(v1, v2)});
+                            }
                         }
                     }
-                }
-            } else if (get_index(get_zero_apparent_cofacet(e, 1)) == -1)
-                columns_to_reduce[i++] = e;
+                } else if (get_index(get_zero_apparent_cofacet(e, 1)) == -1)
+                    columns_to_reduce[i++] = e;
+            }
         }
         columns_to_reduce.resize(i);
         std::reverse(columns_to_reduce.begin(), columns_to_reduce.end());
@@ -1340,6 +1342,7 @@ public:
             }
             diameter_entry_t e;
 
+            bool is_essential = false;
             while (true) {
                 if (get_index(pivot) != -1) {
                     auto pair =
@@ -1434,8 +1437,9 @@ public:
 
                         /* Pairs should be extracted if insertion was
                          * first one ! */
+                        value_t death = get_diameter(pivot);
                         size_t location = last_diameter_index++;
-                        diameters[location] = get_diameter(pivot);
+                        diameters[location] = death;
                         auto first_ins =
                             deaths
                                 .insert({get_index(get_entry(pivot)), location})
@@ -1444,52 +1448,67 @@ public:
                         /* Only insert when it is the first time this bar is
                          * encountered
                          */
-                        if (return_flag_persistence_generators && first_ins) {
-                            // Inessential flag persistence generators in dim >
-                            // 0
-                            std::vector<index_t> vertices_birth(dim + 1);
-                            std::vector<index_t> vertices_death(dim + 2);
+                        if (first_ins) {
+                            // Infinite death indicates an essential bar in disguise
+                            is_essential =
+                                (death == std::numeric_limits<value_t>::infinity());
+                            if ((!is_essential) && return_flag_persistence_generators) {
+                                // Inessential flag persistence generators in dim >
+                                // 0
+                                std::vector<index_t> vertices_birth(dim + 1);
+                                std::vector<index_t> vertices_death(dim + 2);
 
-                            index_t birth_idx =
-                                get_index(get_entry(column_to_reduce));
-                            index_t death_idx = get_index(get_entry(pivot));
+                                index_t birth_idx =
+                                    get_index(get_entry(column_to_reduce));
+                                index_t death_idx = get_index(get_entry(pivot));
 
-                            get_simplex_vertices(birth_idx, dim, n,
-                                                 vertices_birth.rbegin());
-                            get_simplex_vertices(death_idx, dim + 1, n,
-                                                 vertices_death.rbegin());
+                                get_simplex_vertices(birth_idx, dim, n,
+                                                     vertices_birth.rbegin());
+                                get_simplex_vertices(death_idx, dim + 1, n,
+                                                     vertices_death.rbegin());
 
-                            edge_t birth_edge =
-                                get_youngest_edge_simplex(vertices_birth);
-                            edge_t death_edge =
-                                get_youngest_edge_simplex(vertices_death);
+                                edge_t birth_edge =
+                                    get_youngest_edge_simplex(vertices_birth);
+                                edge_t death_edge =
+                                    get_youngest_edge_simplex(vertices_death);
 
-                            finite_generator[location] = {
-                                birth_edge.first, birth_edge.second,
-                                death_edge.first, death_edge.second};
+                                finite_generator[location] = {
+                                    birth_edge.first, birth_edge.second,
+                                    death_edge.first, death_edge.second};
+                            }
                         }
 
                         break;
                     }
                 } else {
-                    auto idx_ = idx_essential++;
-                    essential_pair[idx_] = get_diameter(column_to_reduce);
+                    is_essential = true;
+                    break;
+                }
 
-                    if (return_flag_persistence_generators) {
-                        // Essential flag persistence generators in dim > 0
-                        std::vector<index_t> vertices_birth(dim + 1);
+                if (is_essential) {
+                    value_t birth = get_diameter(column_to_reduce);
+                    bool is_born =
+                        (birth != std::numeric_limits<value_t>::infinity());
+                    if (is_born) {
+                        auto idx_ = idx_essential++;
+                        essential_pair[idx_] = birth;
 
-                        index_t birth_idx =
-                            get_index(get_entry(column_to_reduce));
+                        if (return_flag_persistence_generators) {
+                            // Essential flag persistence generators in dim > 0
+                            std::vector<index_t> vertices_birth(dim + 1);
 
-                        get_simplex_vertices(birth_idx, dim, n,
-                                             vertices_birth.rbegin());
+                            index_t birth_idx =
+                                get_index(get_entry(column_to_reduce));
 
-                        edge_t birth_edge =
-                            get_youngest_edge_simplex(vertices_birth);
+                            get_simplex_vertices(birth_idx, dim, n,
+                                                 vertices_birth.rbegin());
 
-                        essential_generator[idx_] = {birth_edge.first,
-                                                     birth_edge.second};
+                            edge_t birth_edge =
+                                get_youngest_edge_simplex(vertices_birth);
+
+                            essential_generator[idx_] = {birth_edge.first,
+                                                         birth_edge.second};
+                        }
                     }
 
                     // TODO: these will need special attention, if output
@@ -1562,11 +1581,9 @@ public:
                       std::greater<>());
 #endif
             for (size_t i = 0; i < idx_essential; ++i) {
-                if (!std::isinf(essential_pair[i])) {
-                    births_and_deaths_by_dim[dim].push_back(essential_pair[i]);
-                    births_and_deaths_by_dim[dim].push_back(
-                        std::numeric_limits<value_t>::infinity());
-                }
+                births_and_deaths_by_dim[dim].push_back(essential_pair[i]);
+                births_and_deaths_by_dim[dim].push_back(
+                    std::numeric_limits<value_t>::infinity());
             }
         }
 
