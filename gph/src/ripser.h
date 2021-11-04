@@ -112,6 +112,44 @@ void check_overflow(index_t i)
             std::to_string(max_simplex_index));
 }
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#pragma intrinsic(_BitScanReverse64)
+
+uint64_t __inline clzl(uint64_t value) {
+	unsigned long leading_zero = 0;
+
+	if (_BitScanReverse64(&leading_zero, value)) {
+		return 63 - leading_zero;
+	} else {
+		// Same remarks as above
+		return 64;
+	}
+}
+
+#define __builtin_clzl(x) clzl(x)
+#endif
+
+static inline uint64_t int_cbrt_64 (uint64_t x)
+{
+    uint64_t r0 = 1, r1;
+
+    if (x == 0)
+        return (0);
+
+    int b = (64) - __builtin_clzl(x);
+    r0 <<= (b + 2) / 3; /* ceil(b / 3) */
+
+    do /* quadratic convergence: */
+    {
+        r1 = r0;
+        r0 = (2 * r1 + x / (r1 * r1)) / 3;
+    }
+    while (r0 < r1);
+
+    return r1; /* floor(cbrt(x)); */
+}
+
 class binomial_coeff_table
 {
     using row_bc = std::vector<index_t>;
@@ -698,9 +736,8 @@ public:
         if (k != 3) {
             return get_max(n, cnt, pred);
         } else {
-            double to_cbrt = 6 * idx;
             index_t guess =
-                static_cast<index_t>(std::floor(std::cbrt(to_cbrt))) + 1;
+                static_cast<index_t>(int_cbrt_64(6 * static_cast<uint64_t>(idx))) + 1;
 
             /* Perform a local linear search starting from guess,
              * instead of a binary search. */
