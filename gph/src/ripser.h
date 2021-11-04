@@ -737,23 +737,15 @@ public:
             return get_max(n, cnt, pred);
         } else {
             index_t guess =
-                static_cast<index_t>(int_cbrt_64(6 * static_cast<uint64_t>(idx))) + 1;
+                static_cast<index_t>(int_cbrt_64(6 * static_cast<uint64_t>(idx)));
 
             /* Perform a local linear search starting from guess,
              * instead of a binary search. */
-            const bool increment = pred(guess);
-
             while (true) {
-                if (increment) {
-                    ++guess;
-                    if (!pred(guess)) {
-                        --guess;
-                        break;
-                    }
-                } else {
+                ++guess;
+                if (!pred(guess)) {
                     --guess;
-                    if (pred(guess))
-                        break;
+                    break;
                 }
             }
 
