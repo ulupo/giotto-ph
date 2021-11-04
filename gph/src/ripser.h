@@ -724,9 +724,9 @@ public:
         if (k != 3) {
             return get_max(n, cnt, pred);
         } else {
-            to_cbrt = 6 * static_cast<U64>(idx);
+            U64 to_cbrt = 6 * static_cast<U64>(idx);
             index_t guess =
-                static_cast<index_t>(icbrt(to_cbrt))) + 1;
+                static_cast<index_t>(icbrt64(to_cbrt)) + 1;
 
             /* Perform a local linear search starting from guess,
              * instead of a binary search. */
