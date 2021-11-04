@@ -90,6 +90,32 @@ typedef float value_t;
 typedef int64_t index_t;
 typedef uint16_t coefficient_t;
 
+
+
+typedef unsigned int U32;
+typedef unsigned __int64 U64;
+
+// ---- actual cube root code
+
+U32 icbrt64(U64 x) {
+  int s;
+  U32 y;
+  U64 b;
+
+  y = 0;
+  for (s = 63; s >= 0; s -= 3) {
+    y += y;
+    b = 3*y*((U64) y + 1) + 1;
+    if ((x >> s) >= b) {
+      x -= b << s;
+      y++;
+    }
+  }
+  return y;
+}
+
+
+
 using barcodes_t = std::vector<value_t>;
 
 static const size_t num_coefficient_bits = 8;
@@ -698,9 +724,9 @@ public:
         if (k != 3) {
             return get_max(n, cnt, pred);
         } else {
-            double to_cbrt = 6 * idx;
+            to_cbrt = 6 * static_cast<U64>(idx);
             index_t guess =
-                static_cast<index_t>(std::floor(std::cbrt(to_cbrt))) + 1;
+                static_cast<index_t>(icbrt(to_cbrt))) + 1;
 
             /* Perform a local linear search starting from guess,
              * instead of a binary search. */
