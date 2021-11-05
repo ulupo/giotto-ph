@@ -750,7 +750,7 @@ public:
             top <<= ceil;
             count <<= ceil - floor;
             count -= 1;
-            count << floor;
+            count <<= floor;
         }
 
         return get_max(static_cast<index_t>(top),
