@@ -731,29 +731,40 @@ public:
             return n;
 
         uint64_t k_fact, top = 1, bottom = 1, count = 1;
-        uint32_t sig_figs_top, sig_figs_bottom, sig_figs_n, ceil, floor = 0;
+        uint32_t sig_figs, sig_figs_n, ceil, floor = 0;
 
         k_fact = static_cast<uint64_t>(factorials(k));
-        sig_figs_top =
-            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx) + static_cast<uint64_t>(k) - 1);
-        sig_figs_bottom =
+        sig_figs =
             (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx));
         sig_figs_n =
             (64) - __builtin_clzl(static_cast<uint64_t>(n));
-        ceil = (sig_figs_top + 2) / 3; /* Using: ceil(a / 3) = (a + 2) / 3 */
-        if (sig_figs_bottom)
-            floor = (sig_figs_bottom - 1) / 3; /* floor((a - 1) / 3) */
+        ceil = (sig_figs + 2) / 3; /* Using: ceil(a / 3) = (a + 2) / 3 */
+        if (sig_figs > 0)
+            floor = (sig_figs - 1) / 3; /* floor((a - 1) / 3) */
 
+        if (sig_figs_n <= ceil) {
+            top = static_cast<uint64_t>(n);
+        } else {
+            top <<= ceil;
+            top += static_cast<uint64_t>(k) - 1;
+        }
+        bottom <<= floor;
+        count = top - bottom;
+
+        /* ALT
         if (sig_figs_n <= ceil) {
             top = static_cast<uint64_t>(n);
             bottom <<= floor;
             count = top - bottom;
         } else {
             top <<= ceil;
+            top += k - 1;
             count <<= ceil - floor;
             count -= 1;
             count <<= floor;
+            count += k - 1;
         }
+        */
 
         return get_max(static_cast<index_t>(top),
                        static_cast<index_t>(count), pred);
