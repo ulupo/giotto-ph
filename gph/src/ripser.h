@@ -132,22 +132,21 @@ uint64_t __inline clzl(uint64_t value) {
 
 static inline uint64_t int_cbrt_64 (uint64_t x)
 {
-    uint64_t r0 = 1, r1;
+    uint64_t r = 1;
 
     if (x == 0)
         return (0);
 
     int b = (64) - __builtin_clzl(x);
-    r0 <<= (b + 2) / 3; /* ceil(b / 3) */
+    r <<= (b + 2) / 3; /* ceil(b / 3) */
 
-    do /* quadratic convergence: */
-    {
-        r1 = r0;
-        r0 = (2 * r1 + x / (r1 * r1)) / 3;
+    uint64_t rsq = r * r;
+    while ((rsq * r) > x) { /* quadratic convergence: */
+        r = (2 * r + x / rsq) / 3;
+        rsq = r * r;
     }
-    while (r0 < r1);
 
-    return r1; /* floor(cbrt(x)); */
+    return r; /* floor(cbrt(x)); */
 }
 
 class binomial_coeff_table
