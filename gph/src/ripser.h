@@ -733,24 +733,7 @@ public:
         if (pred(n) || (cnt <= 0))
             return n;
 
-        if (k != 3) {
-            return get_max(n, cnt, pred);
-        } else {
-            index_t guess =
-                static_cast<index_t>(int_cbrt_64(6 * static_cast<uint64_t>(idx)));
-
-            /* Perform a local linear search starting from guess,
-             * instead of a binary search. */
-            while (true) {
-                ++guess;
-                if (!pred(guess)) {
-                    --guess;
-                    break;
-                }
-            }
-
-            return guess;
-        }
+        return get_max(n, cnt, pred);
     }
 
     index_t get_edge_index(const index_t i, const index_t j) const
@@ -766,10 +749,28 @@ public:
         /* Perform steps for k = 1 and 2 using the exact formula for the
          * integer part of the real number solution of binom(n, 2) = idx,
          * see below. */
-        for (index_t k = dim + 1; k > 2; --k) {
-            n = get_max_vertex(idx, k, n);
+        for (index_t k = dim + 1; k > 3; --k) {
+                n = get_max_vertex(idx, k, n);
+                *out++ = n;
+                idx -= binomial_coeff(n, k);
+        }
+
+        if (dim > 1) {
+            /* Perform a local linear search starting from a good guess,
+             * instead of a binary search. */
+            const index_t cnt = n - 2;
+            if ((binomial_coeff(n, 3) > idx) && (cnt > 0)) {
+                n = static_cast<index_t>(int_cbrt_64(6 * static_cast<uint64_t>(idx)));
+                while (true) {
+                    ++n;
+                    if (binomial_coeff(n, 3) > idx) {
+                        --n;
+                        break;
+                    }
+                }
+            }
             *out++ = n;
-            idx -= binomial_coeff(n, k);
+            idx -= binomial_coeff(n, 3);
         }
 
         double to_sqrt = 2 * idx + 0.25;
