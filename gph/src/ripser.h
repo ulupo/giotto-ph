@@ -116,39 +116,18 @@ void check_overflow(index_t i)
 #include <intrin.h>
 #pragma intrinsic(_BitScanReverse64)
 
-uint64_t __inline clzl(uint64_t value) {
+uint32_t __inline clzl(uint64_t value) {
 	unsigned long leading_zero = 0;
 
 	if (_BitScanReverse64(&leading_zero, value)) {
 		return 63 - leading_zero;
 	} else {
-		// Same remarks as above
 		return 64;
 	}
 }
 
 #define __builtin_clzl(x) clzl(x)
 #endif
-
-static inline uint64_t int_cbrt_64 (uint64_t x)
-{
-    uint64_t r0 = 1, r1;
-
-    if (x == 0)
-        return (0);
-
-    int b = (64) - __builtin_clzl(x);
-    r0 <<= (b + 2) / 3; /* ceil(b / 3) */
-
-    do /* quadratic convergence: */
-    {
-        r1 = r0;
-        r0 = (2 * r1 + x / (r1 * r1)) / 3;
-    }
-    while (r0 < r1);
-
-    return r1; /* floor(cbrt(x)); */
-}
 
 class binomial_coeff_table
 {
@@ -177,6 +156,24 @@ public:
     {
         assert(n < B.size() && k < B[n].size() && n >= k - 1);
         return B[n][k];
+    }
+};
+
+class factorials_table
+{
+    std::vector<index_t> F;
+
+public:
+    factorials_table(index_t k) : F(k + 1, 1)
+    {
+        for (index_t i = 1; i <= k; ++i) {
+            F[i] = i * F[i - 1];
+        }
+    }
+
+    index_t operator()(index_t k) const
+    {
+        return F[k];
     }
 };
 
@@ -648,6 +645,7 @@ class ripser
     const float ratio;
     const coefficient_t modulus;
     const binomial_coeff_table binomial_coeff;
+    const factorials_table factorials;
     const std::vector<coefficient_t> multiplicative_inverse;
     int num_threads;
     std::unique_ptr<ctpl::thread_pool> p;
@@ -695,6 +693,7 @@ public:
         : dist(std::move(_dist)), n(dist.size()), dim_max(_dim_max),
           threshold(_threshold), ratio(_ratio), modulus(_modulus),
           num_threads(_num_threads), binomial_coeff(n, dim_max + 2),
+          factorials(dim_max + 2),
           multiplicative_inverse(multiplicative_inverse_vector(_modulus)),
           return_flag_persistence_generators(
               return_flag_persistence_generators_)
@@ -728,12 +727,34 @@ public:
             return (binomial_coeff(w, k) <= idx);
         };
 
-        const index_t cnt = n - (k - 1);
-
-        if (pred(n) || (cnt <= 0))
+        if (pred(n) || (n < k))
             return n;
 
-        return get_max(n, cnt, pred);
+        uint64_t top = 1, bottom = 1, count = 1;
+        uint64_t k_fact = static_cast<uint64_t>(factorials(k));
+        uint32_t sig_figs_top =
+            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx) + static_cast<uint64_t>(k) - 1);
+        uint32_t sig_figs_bottom =
+            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx));
+        uint32_t sig_figs_n =
+            (64) - __builtin_clzl(static_cast<uint64_t>(n));
+
+        uint32_t ceil = (sig_figs_top + 2) / 3; /* Using: ceil(a / 3) = (a + 2) / 3 */
+        uint32_t floor = (sig_figs_bottom - 1) / 3; /* floor((a - 1) / 3) */
+
+        if (sig_figs_n <= ceil) {
+            top = static_cast<uint64_t>(n);
+            bottom <<= floor;
+            count = top - bottom;
+        } else {
+            top <<= ceil;
+            count <<= ceil - floor;
+            count -= 1;
+            count << floor;
+        }
+
+        return get_max(static_cast<index_t>(top),
+                       static_cast<index_t>(count), pred);
     }
 
     index_t get_edge_index(const index_t i, const index_t j) const
@@ -749,28 +770,10 @@ public:
         /* Perform steps for k = 1 and 2 using the exact formula for the
          * integer part of the real number solution of binom(n, 2) = idx,
          * see below. */
-        for (index_t k = dim + 1; k > 3; --k) {
+        for (index_t k = dim + 1; k > 2; --k) {
                 n = get_max_vertex(idx, k, n);
                 *out++ = n;
                 idx -= binomial_coeff(n, k);
-        }
-
-        if (dim > 1) {
-            /* Perform a local linear search starting from a good guess,
-             * instead of a binary search. */
-            const index_t cnt = n - 2;
-            if ((binomial_coeff(n, 3) > idx) && (cnt > 0)) {
-                n = static_cast<index_t>(int_cbrt_64(6 * static_cast<uint64_t>(idx)));
-                while (true) {
-                    ++n;
-                    if (binomial_coeff(n, 3) > idx) {
-                        --n;
-                        break;
-                    }
-                }
-            }
-            *out++ = n;
-            idx -= binomial_coeff(n, 3);
         }
 
         double to_sqrt = 2 * idx + 0.25;
@@ -808,6 +811,7 @@ public:
         index_t dim;
         coefficient_t modulus;
         const binomial_coeff_table* binomial_coeff;
+        const factorials_table* factorials;
         const ripser* parent;
 
     public:
@@ -815,7 +819,8 @@ public:
                                     const index_t _dim, const ripser& _parent)
             : idx_below(get_index(_simplex)), idx_above(0), j(_parent.n - 1),
               k(_dim), simplex(_simplex), modulus(_parent.modulus),
-              binomial_coeff(&_parent.binomial_coeff), parent(&_parent)
+              binomial_coeff(&_parent.binomial_coeff),
+              factorials(&_parent.factorials), parent(&_parent)
         {
         }
 
@@ -836,6 +841,8 @@ public:
             modulus = _parent.modulus;
             binomial_coeff =
                 &const_cast<binomial_coeff_table&>(_parent.binomial_coeff);
+            factorials =
+                &const_cast<factorials_table&>(_parent.factorials);
             parent = &const_cast<ripser&>(_parent);
         }
 
@@ -1714,12 +1721,14 @@ class ripser<compressed_lower_distance_matrix>::simplex_coboundary_enumerator
     coefficient_t modulus;
     const compressed_lower_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
+    const factorials_table* factorials;
 
 public:
     simplex_coboundary_enumerator(
         const ripser<compressed_lower_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
-          binomial_coeff(&_parent.binomial_coeff)
+          binomial_coeff(&_parent.binomial_coeff),
+          factorials(&_parent.factorials)
     {
     }
 
@@ -1735,6 +1744,7 @@ public:
         modulus = _parent.modulus;
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
+        factorials = &_parent.factorials;
         parent = &_parent;
         _parent.get_simplex_vertices(get_index(_simplex), _dim, _parent.n,
                                      vertices.rbegin());
@@ -1777,6 +1787,7 @@ class ripser<sparse_distance_matrix>::simplex_coboundary_enumerator
     coefficient_t modulus;
     const sparse_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
+    const factorials_table* factorials;
     std::vector<std::vector<index_diameter_t>::const_reverse_iterator>
         neighbor_it;
     std::vector<std::vector<index_diameter_t>::const_reverse_iterator>
@@ -1786,7 +1797,8 @@ class ripser<sparse_distance_matrix>::simplex_coboundary_enumerator
 public:
     simplex_coboundary_enumerator(const ripser<sparse_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
-          binomial_coeff(&_parent.binomial_coeff)
+          binomial_coeff(&_parent.binomial_coeff),
+          factorials(&_parent.factorials)
     {
     }
 
@@ -1801,6 +1813,7 @@ public:
         modulus = _parent.modulus;
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
+        factorials = &_parent.factorials;
         parent = &_parent;
         _parent.get_simplex_vertices(idx_below, _dim, _parent.n,
                                      vertices.rbegin());
