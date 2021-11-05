@@ -730,17 +730,19 @@ public:
         if (pred(n) || (n < k))
             return n;
 
-        uint64_t top = 1, bottom = 1, count = 1;
-        uint64_t k_fact = static_cast<uint64_t>(factorials(k));
-        uint32_t sig_figs_top =
-            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx) + static_cast<uint64_t>(k) - 1);
-        uint32_t sig_figs_bottom =
-            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx));
-        uint32_t sig_figs_n =
-            (64) - __builtin_clzl(static_cast<uint64_t>(n));
+        uint64_t k_fact, top = 1, bottom = 1, count = 1;
+        uint32_t sig_figs_top, sig_figs_bottom, sig_figs_n, ceil, floor = 0;
 
-        uint32_t ceil = (sig_figs_top + 2) / 3; /* Using: ceil(a / 3) = (a + 2) / 3 */
-        uint32_t floor = (sig_figs_bottom - 1) / 3; /* floor((a - 1) / 3) */
+        k_fact = static_cast<uint64_t>(factorials(k));
+        sig_figs_top =
+            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx) + static_cast<uint64_t>(k) - 1);
+        sig_figs_bottom =
+            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx));
+        sig_figs_n =
+            (64) - __builtin_clzl(static_cast<uint64_t>(n));
+        ceil = (sig_figs_top + 2) / 3; /* Using: ceil(a / 3) = (a + 2) / 3 */
+        if (sig_figs_bottom)
+            floor = (sig_figs_bottom - 1) / 3; /* floor((a - 1) / 3) */
 
         if (sig_figs_n <= ceil) {
             top = static_cast<uint64_t>(n);
@@ -771,9 +773,9 @@ public:
          * integer part of the real number solution of binom(n, 2) = idx,
          * see below. */
         for (index_t k = dim + 1; k > 2; --k) {
-                n = get_max_vertex(idx, k, n);
-                *out++ = n;
-                idx -= binomial_coeff(n, k);
+            n = get_max_vertex(idx, k, n);
+            *out++ = n;
+            idx -= binomial_coeff(n, k);
         }
 
         double to_sqrt = 2 * idx + 0.25;
