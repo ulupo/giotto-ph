@@ -738,9 +738,9 @@ public:
             (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx));
         sig_figs_n =
             (64) - __builtin_clzl(static_cast<uint64_t>(n));
-        ceil = (sig_figs + 2) / 3; /* Using: ceil(a / 3) = (a + 2) / 3 */
+        ceil = (sig_figs + static_cast<uint64_t>(k) - 1) / static_cast<uint64_t>(k); /* Using: ceil(a / k) = (a + k - 1) / k */
         if (sig_figs > 0)
-            floor = (sig_figs - 1) / 3; /* floor((a - 1) / 3) */
+            floor = (sig_figs - 1) / static_cast<uint64_t>(k); /* floor((a - 1) / k) */
 
         if (sig_figs_n <= ceil) {
             top = static_cast<uint64_t>(n);
