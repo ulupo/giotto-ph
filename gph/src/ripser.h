@@ -161,19 +161,58 @@ public:
 
 class factorials_table
 {
-    std::vector<index_t> F;
+    std::vector<uint64_t> F;
 
 public:
     factorials_table(index_t k) : F(k + 1, 1)
     {
         for (index_t i = 1; i <= k; ++i) {
-            F[i] = i * F[i - 1];
+            F[i] = static_cast<uint64_t>(i) * F[i - 1];
         }
     }
 
     index_t operator()(index_t k) const
     {
         return F[k];
+    }
+};
+
+class tops_and_counts_tensor
+{
+    using pair_tc = std::vector<index_t>;
+    using mat_tc = std::vector<pair_tc>;
+    using tens_tc = std::vector<mat_tc>;
+    tens_tc T;
+
+public:
+    /* Tensor T of shape (k + 1, (number of integer bits used) + 1, 2).
+     * For each 0 <= i <= k and for each 0 <= b <= (number of integer bits),
+     * T[i][b][0] (`top`) equals min(floor(2^(b / k)) + k - 1, (n - 1))
+     * where `n` is the number of vertices, while T[i][b][1] (`count`)
+     * equals top - floor(2^((b - 1) / k)). `top` and `counts` are used in place
+     * of (n - 1) and (n - k) respectively, to restrict the domain of the binary
+     * search in get_max_vertex. */
+    tops_and_counts_tensor(index_t n, index_t k) : T(k + 1, mat_tc(65, pair_tc(2, 0)))
+    {
+        // Start at 2 because 0 and 1 are not needed
+        for (index_t i = 2; i <= k; ++i) {
+            T[i][0][0] = 1;
+            for (index_t b = 1; b <= 64; ++b) {
+                T[i][b][0] = std::floor(std::pow(2, static_cast<double>(b) / i));
+                T[i][b][1] = -T[i][b - 1][0];
+            }
+        }
+        for (index_t i = 2; i <= k; ++i) {
+            for (index_t b = 0; b <= 64; ++b) {
+                T[i][b][0] = std::min(T[i][b][0] + k - 1, n - 1);
+                T[i][b][1] += T[i][b][0];
+            }
+        }
+    }
+
+    index_t operator()(index_t k, index_t b, index_t j) const
+    {
+        return T[k][b][j];
     }
 };
 
@@ -646,6 +685,7 @@ class ripser
     const coefficient_t modulus;
     const binomial_coeff_table binomial_coeff;
     const factorials_table factorials;
+    const tops_and_counts_tensor tops_and_counts;
     const std::vector<coefficient_t> multiplicative_inverse;
     int num_threads;
     std::unique_ptr<ctpl::thread_pool> p;
@@ -693,7 +733,7 @@ public:
         : dist(std::move(_dist)), n(dist.size()), dim_max(_dim_max),
           threshold(_threshold), ratio(_ratio), modulus(_modulus),
           num_threads(_num_threads), binomial_coeff(n, dim_max + 2),
-          factorials(dim_max + 2),
+          factorials(dim_max + 2), tops_and_counts(n, dim_max + 2),
           multiplicative_inverse(multiplicative_inverse_vector(_modulus)),
           return_flag_persistence_generators(
               return_flag_persistence_generators_)
@@ -730,44 +770,13 @@ public:
         if (pred(n) || (n < k))
             return n;
 
-        uint64_t k_fact, top = 1, bottom = 1, count = 1;
-        uint32_t sig_figs, sig_figs_n, ceil, floor = 0;
-
-        k_fact = static_cast<uint64_t>(factorials(k));
-        sig_figs =
+        uint64_t k_fact = factorials(k);
+        uint32_t sig_figs =
             (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx));
-        sig_figs_n =
-            (64) - __builtin_clzl(static_cast<uint64_t>(n));
-        ceil = (sig_figs + static_cast<uint64_t>(k) - 1) / static_cast<uint64_t>(k); /* Using: ceil(a / k) = (a + k - 1) / k */
-        if (sig_figs > 0)
-            floor = (sig_figs - 1) / static_cast<uint64_t>(k); /* floor((a - 1) / k) */
+        index_t top = tops_and_counts(k, sig_figs, 0);
+        index_t count = tops_and_counts(k, sig_figs, 1);
 
-        if (sig_figs_n <= ceil) {
-            top = static_cast<uint64_t>(n);
-        } else {
-            top <<= ceil;
-            top += static_cast<uint64_t>(k) - 1;
-        }
-        bottom <<= floor;
-        count = top - bottom;
-
-        /* ALT
-        if (sig_figs_n <= ceil) {
-            top = static_cast<uint64_t>(n);
-            bottom <<= floor;
-            count = top - bottom;
-        } else {
-            top <<= ceil;
-            top += k - 1;
-            count <<= ceil - floor;
-            count -= 1;
-            count <<= floor;
-            count += k - 1;
-        }
-        */
-
-        return get_max(static_cast<index_t>(top),
-                       static_cast<index_t>(count), pred);
+        return get_max(top, count, pred);
     }
 
     index_t get_edge_index(const index_t i, const index_t j) const
@@ -825,6 +834,7 @@ public:
         coefficient_t modulus;
         const binomial_coeff_table* binomial_coeff;
         const factorials_table* factorials;
+        const tops_and_counts_tensor* tops_and_counts;
         const ripser* parent;
 
     public:
@@ -833,7 +843,9 @@ public:
             : idx_below(get_index(_simplex)), idx_above(0), j(_parent.n - 1),
               k(_dim), simplex(_simplex), modulus(_parent.modulus),
               binomial_coeff(&_parent.binomial_coeff),
-              factorials(&_parent.factorials), parent(&_parent)
+              factorials(&_parent.factorials),
+              tops_and_counts(&_parent.tops_and_counts),
+              parent(&_parent)
         {
         }
 
@@ -856,6 +868,8 @@ public:
                 &const_cast<binomial_coeff_table&>(_parent.binomial_coeff);
             factorials =
                 &const_cast<factorials_table&>(_parent.factorials);
+            tops_and_counts =
+                &const_cast<tops_and_counts_tensor&>(_parent.tops_and_counts);
             parent = &const_cast<ripser&>(_parent);
         }
 
@@ -1735,13 +1749,15 @@ class ripser<compressed_lower_distance_matrix>::simplex_coboundary_enumerator
     const compressed_lower_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
     const factorials_table* factorials;
+    const tops_and_counts_tensor* tops_and_counts;
 
 public:
     simplex_coboundary_enumerator(
         const ripser<compressed_lower_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
           binomial_coeff(&_parent.binomial_coeff),
-          factorials(&_parent.factorials)
+          factorials(&_parent.factorials),
+          tops_and_counts(&_parent.tops_and_counts)
     {
     }
 
@@ -1758,6 +1774,7 @@ public:
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
         factorials = &_parent.factorials;
+        tops_and_counts = &_parent.tops_and_counts;
         parent = &_parent;
         _parent.get_simplex_vertices(get_index(_simplex), _dim, _parent.n,
                                      vertices.rbegin());
@@ -1801,6 +1818,7 @@ class ripser<sparse_distance_matrix>::simplex_coboundary_enumerator
     const sparse_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
     const factorials_table* factorials;
+    const tops_and_counts_tensor* tops_and_counts;
     std::vector<std::vector<index_diameter_t>::const_reverse_iterator>
         neighbor_it;
     std::vector<std::vector<index_diameter_t>::const_reverse_iterator>
@@ -1811,7 +1829,8 @@ public:
     simplex_coboundary_enumerator(const ripser<sparse_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
           binomial_coeff(&_parent.binomial_coeff),
-          factorials(&_parent.factorials)
+          factorials(&_parent.factorials),
+          tops_and_counts(&_parent.tops_and_counts)
     {
     }
 
@@ -1827,6 +1846,7 @@ public:
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
         factorials = &_parent.factorials;
+        tops_and_counts = &_parent.tops_and_counts;
         parent = &_parent;
         _parent.get_simplex_vertices(idx_below, _dim, _parent.n,
                                      vertices.rbegin());
