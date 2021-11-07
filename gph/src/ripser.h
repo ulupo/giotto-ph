@@ -775,7 +775,7 @@ public:
         index_t sig_figs =
             static_cast<index_t>((64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx)));
         index_t top = tops_and_counts(k, sig_figs, 0);
-        index_t count = tops_and_counts(k, sig_figs, 1);
+        const index_t count = tops_and_counts(k, sig_figs, 1);
 
         return get_max(top, count, pred);
     }
