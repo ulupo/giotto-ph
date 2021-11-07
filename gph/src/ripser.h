@@ -199,7 +199,7 @@ public:
             T[i][0][0] = 1;
             for (index_t b = 1; b <= 64; ++b) {
                 T[i][b][0] =
-                    static_cast<index_t>(std::floor(std::pow(2, static_cast<double>(b) / i)));
+                    static_cast<index_t>(std::floor(std::pow(2., static_cast<double>(b) / i)));
                 T[i][b][1] = -T[i][b - 1][0];
             }
         }
@@ -772,8 +772,8 @@ public:
             return n;
 
         uint64_t k_fact = factorials(k);
-        uint32_t sig_figs =
-            (64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx));
+        index_t sig_figs =
+            static_cast<index_t>((64) - __builtin_clzl(k_fact * static_cast<uint64_t>(idx)));
         index_t top = tops_and_counts(k, sig_figs, 0);
         index_t count = tops_and_counts(k, sig_figs, 1);
 
