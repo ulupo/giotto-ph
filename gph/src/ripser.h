@@ -205,7 +205,7 @@ public:
         }
         for (index_t i = 2; i <= k; ++i) {
             for (index_t b = 0; b <= 64; ++b) {
-                T[i][b][0] = std::min(T[i][b][0] + k - 1, n - 1);
+                T[i][b][0] = std::min(T[i][b][0] + i - 1, n - 1);
                 T[i][b][1] += T[i][b][0];
             }
         }
