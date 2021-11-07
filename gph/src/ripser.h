@@ -198,7 +198,8 @@ public:
         for (index_t i = 2; i <= k; ++i) {
             T[i][0][0] = 1;
             for (index_t b = 1; b <= 64; ++b) {
-                T[i][b][0] = std::floor(std::pow(2, static_cast<double>(b) / i));
+                T[i][b][0] =
+                    static_cast<index_t>(std::floor(std::pow(2, static_cast<double>(b) / i)));
                 T[i][b][1] = -T[i][b - 1][0];
             }
         }
