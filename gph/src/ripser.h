@@ -130,6 +130,8 @@ uint64_t __inline clzl(uint64_t value) {
 #define __builtin_clzl(x) clzl(x)
 #endif
 
+static const std::vector<uint64_t> floors = {1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25, 32, 40, 50, 64, 80, 101, 128, 161, 203, 256, 322, 406, 512, 645, 812, 1024, 1290, 1625, 2048, 2580, 3250, 4096, 5160, 6501, 8192, 10321, 13003, 16384, 20642, 26007, 32768, 41285, 52015, 65536, 82570, 104031, 131072, 165140, 208063, 262144, 330280, 416127, 524288, 660561, 832255, 1048576, 1321122, 1664510, 2097152, 2642245};
+
 static inline uint64_t int_cbrt_64 (uint64_t x)
 {
     uint64_t r0 = 1, r1;
@@ -138,7 +140,7 @@ static inline uint64_t int_cbrt_64 (uint64_t x)
         return (0);
 
     int b = (64) - __builtin_clzl(x);
-    r0 <<= (b + 2) / 3; /* ceil(b / 3) */
+    r0 = floors[b];
 
     do /* quadratic convergence: */
     {
