@@ -187,9 +187,9 @@ class tops_and_counts_tensor
 public:
     /* Tensor T of shape (k + 1, (number of integer bits used) + 1, 2).
      * For each 0 <= i <= k and for each 0 <= b <= (number of integer bits),
-     * T[i][b][0] (`top`) equals min(floor(2^(b / k)) + k - 1, (n - 1))
+     * T[i][b][0] (`top`) equals min(floor(2^(b / i)) + i - 1, (n - 1))
      * where `n` is the number of vertices, while T[i][b][1] (`count`)
-     * equals top - floor(2^((b - 1) / k)). `top` and `counts` are used in place
+     * equals top - floor(2^((b - 1) / i)). `top` and `counts` are used in place
      * of (n - 1) and (n - k) respectively, to restrict the domain of the binary
      * search in get_max_vertex. */
     tops_and_counts_tensor(index_t n, index_t k) : T(k + 1, mat_tc(65, pair_tc(2, 0)))
