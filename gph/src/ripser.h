@@ -195,7 +195,7 @@ public:
     tops_and_counts_tensor(index_t n, index_t k) : T(k + 1, mat_tc(65, pair_tc(2, 0)))
     {
         // Start at 2 because 0 and 1 are not needed
-        for (index_t i = 2; i <= k; ++i) {
+        for (index_t i = 1; i <= k; ++i) {
             T[i][0][0] = 1;
             for (index_t b = 1; b <= 64; ++b) {
                 T[i][b][0] =
@@ -203,7 +203,7 @@ public:
                 T[i][b][1] = -T[i][b - 1][0];
             }
         }
-        for (index_t i = 2; i <= k; ++i) {
+        for (index_t i = 1; i <= k; ++i) {
             for (index_t b = 0; b <= 64; ++b) {
                 T[i][b][0] = std::min(T[i][b][0] + i - 1, n - 1);
                 T[i][b][1] += T[i][b][0];
