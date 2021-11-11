@@ -112,6 +112,23 @@ void check_overflow(index_t i)
             std::to_string(max_simplex_index));
 }
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#pragma intrinsic(_BitScanReverse64)
+
+uint32_t __inline clzll(uint64_t value) {
+	unsigned long leading_one = 0;
+
+	if (_BitScanReverse64(&leading_one, value)) {
+		return 63 - leading_one;
+	} else {
+		return 64;
+	}
+}
+
+#define __builtin_clzll(x) clzll(x)
+#endif
+
 class binomial_coeff_table
 {
     using row_bc = std::vector<index_t>;
@@ -139,6 +156,46 @@ public:
     {
         assert(n < B.size() && k < B[n].size() && n >= k - 1);
         return B[n][k];
+    }
+};
+
+class tops_and_counts_tensor
+{
+    using pair_tc = std::vector<index_t>;
+    using mat_tc = std::vector<pair_tc>;
+    using tens_tc = std::vector<mat_tc>;
+    tens_tc T;
+
+public:
+    /* Tensor T of shape (k + 1, (number of integer bits used) + 1, 2).
+     * For each 0 <= i <= k and for each 0 <= b <= (number of integer bits),
+     * T[i][b][0] (`top`) equals min(floor(2^(b / i)) + i - 1, (n - 1))
+     * where `n` is the number of vertices, while T[i][b][1] (`count`)
+     * equals top - floor(2^((b - 1) / i)). `top` and `counts` are used in place
+     * of (n - 1) and (n - k) respectively, to restrict the domain of the binary
+     * search in get_max_vertex. */
+    tops_and_counts_tensor(index_t n, index_t k) : T(k + 1, mat_tc(65, pair_tc(2, 0)))
+    {
+        // Start at 2 because 0 and 1 are not needed
+        for (index_t i = 1; i <= k; ++i) {
+            T[i][0][0] = 1;
+            for (index_t b = 1; b <= 64; ++b) {
+                T[i][b][0] =
+                    static_cast<index_t>(std::floor(std::pow(2., static_cast<double>(b) / i)));
+                T[i][b][1] = -T[i][b - 1][0];
+            }
+        }
+        for (index_t i = 1; i <= k; ++i) {
+            for (index_t b = 0; b <= 64; ++b) {
+                T[i][b][0] = std::min(T[i][b][0] + i - 1, n - 1);
+                T[i][b][1] += T[i][b][0];
+            }
+        }
+    }
+
+    index_t operator()(index_t k, index_t b, index_t j) const
+    {
+        return T[k][b][j];
     }
 };
 
@@ -690,10 +747,19 @@ public:
             return (binomial_coeff(w, k) <= idx);
         };
 
-        const index_t cnt = n - (k - 1);
-        if (pred(n) || (cnt <= 0))
+        if (pred(n) || (n < k))
             return n;
-        return get_max(n, cnt, pred);
+
+        // Note: __builtin_clzll returns garbage when input is zero!
+        if (idx == 0)
+            return k - 1;
+
+        index_t n_sig_digits =
+            static_cast<index_t>((64) - __builtin_clzll(static_cast<uint64_t>(idx)));
+        index_t top = tops_and_counts(k, n_sig_digits, 0);
+        const index_t count = tops_and_counts(k, sig_figs, 1);
+
+        return get_max(top, count, pred);
     }
 
     index_t get_edge_index(const index_t i, const index_t j) const
