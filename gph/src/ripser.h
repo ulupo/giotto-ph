@@ -208,7 +208,7 @@ public:
 #else
             for (index_t b = 1; b <= 63; ++b) {
                 T[i][64 - b][0] = std::min(n - 1, top_bottom_init[i][0][b]);
-                T[i][64 - b][1] = T[i][b][0] - top_bottom_init[i][1][b];
+                T[i][64 - b][1] = T[i][64 - b][0] - top_bottom_init[i][1][b];
             }
 #endif
         }
