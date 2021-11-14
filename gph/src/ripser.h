@@ -197,6 +197,9 @@ public:
 
         const tens_tc top_bottom_init = _top_bottom_init;
 
+        for (index_t b = 0; b <= 63; ++b) {
+            T[1][b][1] = 0;
+        }
         index_t max_i_from_init = std::min(k, index_t(11));
         // Start at 2
         for (index_t i = 2; i <= max_i_from_init; ++i) {
@@ -204,13 +207,13 @@ public:
             for (index_t b = 0; b <= 62; ++b) {
                 T[i][b][0] = std::min(n - 1, top_bottom_init[i][0][b + 1]);
                 T[i][b][1] = T[i][b][0] - top_bottom_init[i][1][b + 1];
+            }
 #else
             for (index_t b = 1; b <= 63; ++b) {
                 T[i][64 - b][0] = std::min(n - 1, top_bottom_init[i][0][b]);
                 T[i][64 - b][1] = T[i][b][0] - top_bottom_init[i][1][b];
-#endif
-
             }
+#endif
         }
         for (index_t i = (max_i_from_init + 1); i <= k; ++i) {
 #ifdef _MSC_VER
