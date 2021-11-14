@@ -115,18 +115,6 @@ void check_overflow(index_t i)
 #ifdef _MSC_VER
 #include <intrin.h>
 #pragma intrinsic(_BitScanReverse64)
-
-uint32_t __inline clzll(uint64_t value) {
-	unsigned long leading_one = 0;
-
-	if (_BitScanReverse64(&leading_one, value)) {
-		return 63 - leading_one;
-	} else {
-		return 64;
-	}
-}
-
-#define __builtin_clzll(x) clzll(x)
 #endif
 
 class binomial_coeff_table
@@ -161,8 +149,8 @@ public:
 
 class tops_and_counts_tensor
 {
-    using pair_tc = std::vector<index_t>;
-    using mat_tc = std::vector<pair_tc>;
+    using row_tc = std::vector<index_t>;
+    using mat_tc = std::vector<row_tc>;
     using tens_tc = std::vector<mat_tc>;
     tens_tc T;
 
@@ -174,21 +162,64 @@ public:
      * equals top - floor(2^((b - 1) / i)). `top` and `counts` are used in place
      * of (n - 1) and (n - k) respectively, to restrict the domain of the binary
      * search in get_max_vertex. */
-    tops_and_counts_tensor(index_t n, index_t k) : T(k + 1, mat_tc(65, pair_tc(2, 0)))
+    tops_and_counts_tensor(index_t n, index_t k) : T(k + 1, mat_tc(64, row_tc(2, n - 1)))
     {
-        // Start at 2 because 0 and 1 are not needed
-        for (index_t i = 1; i <= k; ++i) {
-            T[i][0][0] = 1;
-            for (index_t b = 1; b <= 64; ++b) {
-                T[i][b][0] =
-                    static_cast<index_t>(std::floor(std::pow(2., static_cast<double>(b) / i)));
-                T[i][b][1] = -T[i][b - 1][0];
+        tens_tc _top_bottom_init(12, mat_tc(2, row_tc(64)));
+        _top_bottom_init[2][0] = {1, 2, 3, 4, 6, 8, 11, 16, 23, 32, 45, 64, 91, 128, 181, 256, 362, 512, 724, 1024, 1448, 2048, 2896, 4096, 5793, 8192, 11585, 16384, 23170, 32768, 46341, 65536, 92682, 131072, 185364, 262144, 370728, 524288, 741455, 1048576, 1482910, 2097152, 2965821, 4194304, 5931642, 8388608, 11863283, 16777216, 23726566, 33554432, 47453133, 67108864, 94906266, 134217728, 189812531, 268435456, 379625062, 536870912, 759250125, 1073741824, 1518500250, 2147483648, 3037000500, 4294967295};
+        _top_bottom_init[2][1] = {1, 2, 2, 3, 4, 6, 8, 11, 16, 23, 32, 45, 64, 91, 128, 181, 256, 362, 512, 724, 1024, 1448, 2048, 2896, 4096, 5793, 8192, 11585, 16384, 23170, 32768, 46341, 65536, 92682, 131072, 185364, 262144, 370728, 524288, 741455, 1048576, 1482910, 2097152, 2965821, 4194304, 5931642, 8388608, 11863283, 16777216, 23726566, 33554432, 47453133, 67108864, 94906266, 134217728, 189812531, 268435456, 379625062, 536870912, 759250125, 1073741824, 1518500250, 2147483648, 3037000500};
+
+        _top_bottom_init[3][0] = {2, 3, 3, 4, 5, 6, 8, 10, 12, 15, 19, 24, 30, 37, 47, 59, 74, 93, 117, 147, 185, 233, 294, 370, 466, 587, 739, 931, 1173, 1477, 1861, 2345, 2954, 3722, 4689, 5908, 7443, 9378, 11815, 14886, 18755, 23630, 29772, 37510, 47260, 59544, 75020, 94520, 119087, 150040, 189039, 238174, 300080, 378078, 476348, 600160, 756155, 952695, 1200320, 1512309, 1905390, 2400640, 3024617, 3810778};
+        _top_bottom_init[3][1] = {2, 3, 3, 4, 4, 5, 6, 8, 10, 12, 15, 19, 24, 30, 37, 47, 59, 74, 93, 117, 147, 185, 233, 294, 370, 466, 587, 739, 931, 1173, 1477, 1861, 2345, 2954, 3722, 4689, 5908, 7443, 9378, 11815, 14886, 18755, 23630, 29772, 37510, 47260, 59544, 75020, 94520, 119087, 150040, 189039, 238174, 300080, 378078, 476348, 600160, 756155, 952695, 1200320, 1512309, 1905390, 2400640, 3024617};
+
+        _top_bottom_init[4][0] = {3, 4, 4, 5, 6, 6, 7, 9, 10, 12, 14, 16, 19, 22, 26, 31, 36, 43, 51, 61, 72, 85, 101, 120, 143, 169, 201, 239, 284, 338, 402, 477, 568, 675, 802, 954, 1134, 1349, 1604, 1907, 2267, 2696, 3206, 3813, 4534, 5392, 6412, 7625, 9067, 10782, 12822, 15248, 18133, 21564, 25643, 30495, 36265, 43126, 51286, 60989, 72529, 86251, 102570, 121976};
+        _top_bottom_init[4][1] = {3, 4, 4, 4, 5, 6, 6, 7, 9, 10, 12, 14, 16, 19, 22, 26, 31, 36, 43, 51, 61, 72, 85, 101, 120, 143, 169, 201, 239, 284, 338, 402, 477, 568, 675, 802, 954, 1134, 1349, 1604, 1907, 2267, 2696, 3206, 3813, 4534, 5392, 6412, 7625, 9067, 10782, 12822, 15248, 18133, 21564, 25643, 30495, 36265, 43126, 51286, 60989, 72529, 86251, 102570};
+
+        _top_bottom_init[5][0] = {4, 5, 5, 6, 6, 7, 8, 9, 10, 11, 12, 14, 15, 17, 20, 22, 25, 29, 33, 38, 43, 49, 57, 65, 74, 85, 97, 112, 128, 147, 168, 193, 222, 254, 292, 335, 385, 442, 507, 582, 668, 768, 882, 1012, 1163, 1335, 1534, 1762, 2023, 2324, 2669, 3066, 3522, 4045, 4646, 5337, 6130, 7042, 8088, 9291, 10672, 12259, 14082, 16174};
+        _top_bottom_init[5][1] = {4, 5, 5, 5, 6, 6, 7, 8, 9, 10, 11, 12, 14, 15, 17, 20, 22, 25, 29, 33, 38, 43, 49, 57, 65, 74, 85, 97, 112, 128, 147, 168, 193, 222, 254, 292, 335, 385, 442, 507, 582, 668, 768, 882, 1012, 1163, 1335, 1534, 1762, 2023, 2324, 2669, 3066, 3522, 4045, 4646, 5337, 6130, 7042, 8088, 9291, 10672, 12259, 14082};
+
+        _top_bottom_init[6][0] = {5, 6, 6, 7, 7, 8, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 26, 29, 32, 36, 40, 45, 50, 56, 62, 70, 78, 87, 98, 110, 123, 137, 154, 173, 194, 217, 243, 273, 306, 343, 385, 432, 485, 544, 610, 685, 768, 862, 968, 1086, 1219, 1368, 1535, 1723, 1933, 2170, 2435, 2733, 3068, 3443, 3864, 4336};
+        _top_bottom_init[6][1] = {5, 6, 6, 6, 7, 7, 8, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 26, 29, 32, 36, 40, 45, 50, 56, 62, 70, 78, 87, 98, 110, 123, 137, 154, 173, 194, 217, 243, 273, 306, 343, 385, 432, 485, 544, 610, 685, 768, 862, 968, 1086, 1219, 1368, 1535, 1723, 1933, 2170, 2435, 2733, 3068, 3443, 3864};
+
+        _top_bottom_init[7][0] = {6, 7, 7, 7, 8, 8, 9, 10, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 25, 27, 30, 32, 36, 39, 43, 47, 52, 57, 62, 68, 75, 83, 91, 100, 111, 122, 134, 148, 163, 180, 198, 219, 241, 266, 294, 324, 357, 394, 435, 480, 530, 585, 645, 712, 786, 868, 958, 1057, 1167, 1288, 1422, 1570, 1732};
+        _top_bottom_init[7][1] = {6, 7, 7, 7, 8, 8, 8, 9, 10, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 25, 27, 30, 32, 36, 39, 43, 47, 52, 57, 62, 68, 75, 83, 91, 100, 111, 122, 134, 148, 163, 180, 198, 219, 241, 266, 294, 324, 357, 394, 435, 480, 530, 585, 645, 712, 786, 868, 958, 1057, 1167, 1288, 1422, 1570};
+
+        _top_bottom_init[8][0] = {7, 8, 8, 8, 9, 9, 10, 10, 11, 12, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 26, 28, 31, 33, 36, 39, 42, 46, 49, 54, 58, 63, 69, 75, 81, 88, 96, 104, 113, 123, 134, 146, 159, 173, 189, 206, 224, 244, 266, 290, 315, 344, 375, 408, 445, 485, 528, 576, 628, 684, 746, 813, 886};
+        _top_bottom_init[8][1] = {7, 8, 8, 8, 8, 9, 9, 10, 10, 11, 12, 12, 13, 14, 15, 16, 17, 18, 20, 21, 23, 24, 26, 28, 31, 33, 36, 39, 42, 46, 49, 54, 58, 63, 69, 75, 81, 88, 96, 104, 113, 123, 134, 146, 159, 173, 189, 206, 224, 244, 266, 290, 315, 344, 375, 408, 445, 485, 528, 576, 628, 684, 746, 813};
+
+        _top_bottom_init[9][0] = {8, 9, 9, 9, 10, 10, 11, 11, 12, 12, 13, 14, 14, 15, 16, 17, 18, 19, 20, 22, 23, 25, 26, 28, 30, 32, 34, 37, 39, 42, 45, 49, 52, 56, 60, 65, 70, 75, 81, 87, 94, 101, 109, 117, 126, 136, 147, 158, 171, 184, 199, 214, 231, 249, 269, 290, 313, 338, 365, 394, 425, 459, 495, 533};
+        _top_bottom_init[9][1] = {8, 9, 9, 9, 9, 10, 10, 11, 11, 12, 12, 13, 14, 14, 15, 16, 17, 18, 19, 20, 22, 23, 25, 26, 28, 30, 32, 34, 37, 39, 42, 45, 49, 52, 56, 60, 65, 70, 75, 81, 87, 94, 101, 109, 117, 126, 136, 147, 158, 171, 184, 199, 214, 231, 249, 269, 290, 313, 338, 365, 394, 425, 459, 495};
+
+        _top_bottom_init[10][0] = {9, 10, 10, 10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 16, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 28, 30, 32, 34, 36, 38, 40, 43, 46, 49, 52, 55, 59, 63, 67, 72, 77, 82, 87, 93, 100, 107, 114, 122, 130, 139, 149, 159, 170, 182, 195, 209, 224, 239, 256, 274, 294, 315, 337, 360};
+        _top_bottom_init[10][1] = {9, 10, 10, 10, 10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 16, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 28, 30, 32, 34, 36, 38, 40, 43, 46, 49, 52, 55, 59, 63, 67, 72, 77, 82, 87, 93, 100, 107, 114, 122, 130, 139, 149, 159, 170, 182, 195, 209, 224, 239, 256, 274, 294, 315, 337};
+
+        _top_bottom_init[11][0] = {10, 11, 11, 11, 12, 12, 12, 13, 13, 14, 14, 15, 15, 16, 17, 18, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 30, 32, 33, 35, 37, 39, 42, 44, 46, 49, 52, 55, 58, 62, 66, 70, 74, 78, 83, 88, 94, 99, 106, 112, 119, 127, 135, 143, 152, 162, 172, 183, 194, 207, 220, 234, 249, 264};
+        _top_bottom_init[11][1] = {10, 11, 11, 11, 11, 12, 12, 12, 13, 13, 14, 14, 15, 15, 16, 17, 18, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 30, 32, 33, 35, 37, 39, 42, 44, 46, 49, 52, 55, 58, 62, 66, 70, 74, 78, 83, 88, 94, 99, 106, 112, 119, 127, 135, 143, 152, 162, 172, 183, 194, 207, 220, 234, 249};
+
+        const tens_tc top_bottom_init = _top_bottom_init;
+
+        index_t max_i_from_init = std::min(k, index_t(11));
+        // Start at 2
+        for (index_t i = 2; i <= max_i_from_init; ++i) {
+#ifdef _MSC_VER
+            for (index_t b = 0; b <= 62; ++b) {
+                T[i][b][0] = std::min(n - 1, top_bottom_init[i][0][b + 1]);
+                T[i][b][1] = T[i][b][0] - top_bottom_init[i][1][b + 1];
+#else
+            for (index_t b = 1; b <= 63; ++b) {
+                T[i][64 - b][0] = std::min(n - 1, top_bottom_init[i][0][b]);
+                T[i][64 - b][1] = T[i][b][0] - top_bottom_init[i][1][b];
+#endif
+
             }
         }
-        for (index_t i = 1; i <= k; ++i) {
-            for (index_t b = 0; b <= 64; ++b) {
-                T[i][b][0] = std::min(T[i][b][0] + i - 1, n - 1);
-                T[i][b][1] += T[i][b][0];
+        for (index_t i = (max_i_from_init + 1); i <= k; ++i) {
+#ifdef _MSC_VER
+            for (index_t b = 0; b <= 62; ++b) {
+                T[i][b][1] = n - i;
+#else
+            for (index_t b = 1; b <= 63; ++b) {
+                T[i][64 - b][1] = n - i;
+#endif
             }
         }
     }
@@ -667,6 +698,7 @@ class ripser
     const float ratio;
     const coefficient_t modulus;
     const binomial_coeff_table binomial_coeff;
+    const tops_and_counts_tensor tops_and_counts;
     const std::vector<coefficient_t> multiplicative_inverse;
     int num_threads;
     std::unique_ptr<ctpl::thread_pool> p;
@@ -714,6 +746,7 @@ public:
         : dist(std::move(_dist)), n(dist.size()), dim_max(_dim_max),
           threshold(_threshold), ratio(_ratio), modulus(_modulus),
           num_threads(_num_threads), binomial_coeff(n, dim_max + 2),
+          tops_and_counts(n, dim_max + 2),
           multiplicative_inverse(multiplicative_inverse_vector(_modulus)),
           return_flag_persistence_generators(
               return_flag_persistence_generators_)
@@ -750,14 +783,20 @@ public:
         if (pred(n) || (n < k))
             return n;
 
-        // Note: __builtin_clzll returns garbage when input is zero!
+        // Note: __builtin_clzll and _BitScanReverse64 return garbage when input is zero!
         if (idx == 0)
             return k - 1;
 
-        index_t n_sig_digits =
-            static_cast<index_t>((64) - __builtin_clzll(static_cast<uint64_t>(idx)));
-        index_t top = tops_and_counts(k, n_sig_digits, 0);
-        const index_t count = tops_and_counts(k, sig_figs, 1);
+#ifdef _MSC_VER
+        unsigned long leading_one = 0;
+        _BitScanReverse64(&leading_one, static_cast<uint64_t>(idx));
+        index_t bit_idx = static_cast<index_t>(leading_one);
+#else
+        index_t bit_idx =
+            static_cast<index_t>(__builtin_clzll(static_cast<uint64_t>(idx)));
+#endif
+        index_t top = tops_and_counts(k, bit_idx, 0);
+        const index_t count = tops_and_counts(k, bit_idx, 1);
 
         return get_max(top, count, pred);
     }
@@ -807,6 +846,7 @@ public:
         index_t dim;
         coefficient_t modulus;
         const binomial_coeff_table* binomial_coeff;
+        const tops_and_counts_tensor* tops_and_counts;
         const ripser* parent;
 
     public:
@@ -814,7 +854,8 @@ public:
                                     const index_t _dim, const ripser& _parent)
             : idx_below(get_index(_simplex)), idx_above(0), j(_parent.n - 1),
               k(_dim), simplex(_simplex), modulus(_parent.modulus),
-              binomial_coeff(&_parent.binomial_coeff), parent(&_parent)
+              binomial_coeff(&_parent.binomial_coeff),
+              tops_and_counts(&_parent.tops_and_counts), parent(&_parent)
         {
         }
 
@@ -835,6 +876,8 @@ public:
             modulus = _parent.modulus;
             binomial_coeff =
                 &const_cast<binomial_coeff_table&>(_parent.binomial_coeff);
+            tops_and_counts =
+                &const_cast<tops_and_counts_tensor&>(_parent.tops_and_counts);
             parent = &const_cast<ripser&>(_parent);
         }
 
@@ -1713,12 +1756,14 @@ class ripser<compressed_lower_distance_matrix>::simplex_coboundary_enumerator
     coefficient_t modulus;
     const compressed_lower_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
+    const tops_and_counts_tensor* tops_and_counts;
 
 public:
     simplex_coboundary_enumerator(
         const ripser<compressed_lower_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
-          binomial_coeff(&_parent.binomial_coeff)
+          binomial_coeff(&_parent.binomial_coeff),
+          tops_and_counts(&_parent.tops_and_counts)
     {
     }
 
@@ -1734,6 +1779,7 @@ public:
         modulus = _parent.modulus;
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
+        tops_and_counts = &_parent.tops_and_counts;
         parent = &_parent;
         _parent.get_simplex_vertices(get_index(_simplex), _dim, _parent.n,
                                      vertices.rbegin());
@@ -1776,6 +1822,7 @@ class ripser<sparse_distance_matrix>::simplex_coboundary_enumerator
     coefficient_t modulus;
     const sparse_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
+    const tops_and_counts_tensor* tops_and_counts;
     std::vector<std::vector<index_diameter_t>::const_reverse_iterator>
         neighbor_it;
     std::vector<std::vector<index_diameter_t>::const_reverse_iterator>
@@ -1785,7 +1832,8 @@ class ripser<sparse_distance_matrix>::simplex_coboundary_enumerator
 public:
     simplex_coboundary_enumerator(const ripser<sparse_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
-          binomial_coeff(&_parent.binomial_coeff)
+          binomial_coeff(&_parent.binomial_coeff),
+          tops_and_counts(&_parent.tops_and_counts)
     {
     }
 
@@ -1800,6 +1848,7 @@ public:
         modulus = _parent.modulus;
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
+        tops_and_counts = &_parent.tops_and_counts;
         parent = &_parent;
         _parent.get_simplex_vertices(idx_below, _dim, _parent.n,
                                      vertices.rbegin());
