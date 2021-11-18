@@ -147,6 +147,41 @@ public:
     }
 };
 
+class harmonic_product_table
+{
+    using row_hp = std::vector<index_t>;
+    using mat_hp = std::vector<row_hp>;
+    mat_hp H;
+
+public:
+    harmonic_product_table(index_t n, index_t k) : H(k + 1, row_hp(n + 1, 0))
+    {
+        std::vector<std::vector<double>> _H(k + 1, std::vector<double>(n + 1, 0));
+        for (index_t i = 0; i <= n; ++i) {
+            _H[1][i] = 1;
+            if (i <= k) {
+                _H[i][i] = 0;
+                for (index_t m = 1; m <= i; ++m)
+                    _H[i][i] += 1 / m;
+            }
+            for (index_t j = 1; j < std::min(i, k + 1); ++j) {
+                _H[j][i] = _H[j - 1][i - 1] + _H[j][i - 1];
+            }
+        }
+
+        for (index_t i = 0; i <= n; ++i) {
+            for (index_t j = 0; j <= k; ++j) {
+                 H[j][i] = static_cast<index_t>(_H[j][i]);
+            }
+        }
+    }
+
+    index_t operator()(index_t n, index_t k) const
+    {
+        return H[k][n];
+    }
+};
+
 class tops_table
 {
     using row_t = std::vector<index_t>;
@@ -607,20 +642,6 @@ private:
     std::vector<std::atomic<Column*>> columns;
 };
 
-template <class Predicate>
-index_t get_max(index_t top, index_t count, const Predicate pred)
-{
-    while (count > 0) {
-        index_t step = count >> 1, mid = top - step;
-        if (!pred(mid)) {
-            top = mid - 1;
-            step = count - (step + 1);
-        }
-        count = step;
-    }
-    return top;
-}
-
 class flagPersGen
 {
 public:
@@ -666,6 +687,7 @@ class ripser
     const float ratio;
     const coefficient_t modulus;
     const binomial_coeff_table binomial_coeff;
+    const harmonic_product_table harmonic_prod;
     const tops_table tops;
     const std::vector<coefficient_t> multiplicative_inverse;
     int num_threads;
@@ -714,6 +736,7 @@ public:
         : dist(std::move(_dist)), n(dist.size()), dim_max(_dim_max),
           threshold(_threshold), ratio(_ratio), modulus(_modulus),
           num_threads(_num_threads), binomial_coeff(n, dim_max + 2),
+          harmonic_prod(n, dim_max + 2),
           tops(n, dim_max + 2),
           multiplicative_inverse(multiplicative_inverse_vector(_modulus)),
           return_flag_persistence_generators(
@@ -744,11 +767,7 @@ public:
     index_t get_max_vertex(const index_t idx, const index_t k,
                            const index_t n) const
     {
-        auto pred = [&](index_t w) -> bool {
-            return (binomial_coeff(w, k) <= idx);
-        };
-
-        if (pred(n) || (n < k))
+        if (binomial_coeff(n, k) <= idx || (n < k))
             return n;
 
         // Note: __builtin_clzll and _BitScanReverse64 return garbage when input is zero!
@@ -764,9 +783,14 @@ public:
             static_cast<index_t>(__builtin_clzll(static_cast<uint64_t>(idx)));
 #endif
         index_t top = tops(k, bit_idx);
-        const index_t count = top;
+        index_t diff = idx - binomial_coeff(top, k);
+        while (diff < 0) {
+            // Round integer divisions towards minus infinity
+            top -= 1 + ((-1 - diff) / harmonic_prod(top, k));
+            diff = idx - binomial_coeff(top, k);
+        }
 
-        return get_max(top, count, pred);
+        return top;
     }
 
     index_t get_edge_index(const index_t i, const index_t j) const
@@ -814,6 +838,7 @@ public:
         index_t dim;
         coefficient_t modulus;
         const binomial_coeff_table* binomial_coeff;
+        const harmonic_product_table* harmonic_prod;
         const tops_table* tops;
         const ripser* parent;
 
@@ -823,6 +848,7 @@ public:
             : idx_below(get_index(_simplex)), idx_above(0), j(_parent.n - 1),
               k(_dim), simplex(_simplex), modulus(_parent.modulus),
               binomial_coeff(&_parent.binomial_coeff),
+              harmonic_prod(&_parent.harmonic_prod),
               tops(&_parent.tops), parent(&_parent)
         {
         }
@@ -844,6 +870,8 @@ public:
             modulus = _parent.modulus;
             binomial_coeff =
                 &const_cast<binomial_coeff_table&>(_parent.binomial_coeff);
+            harmonic_prod =
+                &const_cast<harmonic_product_table&>(_parent.harmonic_prod);
             tops =
                 &const_cast<tops_table&>(_parent.tops);
             parent = &const_cast<ripser&>(_parent);
@@ -1724,6 +1752,7 @@ class ripser<compressed_lower_distance_matrix>::simplex_coboundary_enumerator
     coefficient_t modulus;
     const compressed_lower_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
+    const harmonic_product_table* harmonic_prod;
     const tops_table* tops;
 
 public:
@@ -1731,6 +1760,7 @@ public:
         const ripser<compressed_lower_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
           binomial_coeff(&_parent.binomial_coeff),
+          harmonic_prod(&_parent.harmonic_prod),
           tops(&_parent.tops)
     {
     }
@@ -1747,6 +1777,7 @@ public:
         modulus = _parent.modulus;
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
+        harmonic_prod = &_parent.harmonic_prod;
         tops = &_parent.tops;
         parent = &_parent;
         _parent.get_simplex_vertices(get_index(_simplex), _dim, _parent.n,
@@ -1790,6 +1821,7 @@ class ripser<sparse_distance_matrix>::simplex_coboundary_enumerator
     coefficient_t modulus;
     const sparse_distance_matrix* dist;
     const binomial_coeff_table* binomial_coeff;
+    const harmonic_product_table* harmonic_prod;
     const tops_table* tops;
     std::vector<std::vector<index_diameter_t>::const_reverse_iterator>
         neighbor_it;
@@ -1801,6 +1833,7 @@ public:
     simplex_coboundary_enumerator(const ripser<sparse_distance_matrix>& _parent)
         : parent(&_parent), modulus(_parent.modulus), dist(&_parent.dist),
           binomial_coeff(&_parent.binomial_coeff),
+          harmonic_prod(&_parent.harmonic_prod),
           tops(&_parent.tops)
     {
     }
@@ -1816,6 +1849,7 @@ public:
         modulus = _parent.modulus;
         dist = &_parent.dist;
         binomial_coeff = &_parent.binomial_coeff;
+        harmonic_prod = &_parent.harmonic_prod;
         tops = &_parent.tops;
         parent = &_parent;
         _parent.get_simplex_vertices(idx_below, _dim, _parent.n,
