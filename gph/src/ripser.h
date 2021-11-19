@@ -767,6 +767,12 @@ public:
     index_t get_max_vertex(const index_t idx, const index_t k,
                            const index_t n) const
     {
+        if (k == 2) {
+            double to_sqrt = 2 * idx + 0.25;
+            // Exact formula, modulo numerics
+            return static_cast<index_t>(std::round(std::sqrt(to_sqrt)));
+        }
+
         if (binomial_coeff(n, k) <= idx || (n < k))
             return n;
 
