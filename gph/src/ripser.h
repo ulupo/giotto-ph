@@ -781,6 +781,12 @@ public:
             return (binomial_coeff(w, k) <= idx);
         };
 
+        if (k == 2) {
+            double to_sqrt = 2 * idx + 0.25;
+            // Exact formula, modulo numerics
+            return static_cast<index_t>(std::round(std::sqrt(to_sqrt)));
+        }
+
         if (pred(n) || (n < k))
             return n;
 
