@@ -300,7 +300,7 @@ starts, and the same threads are reused for different computations during
 the program's life span. This approach enables better amortization of the 
 cost of the short-lived threads used in [@morozov2020lock], where one thread 
 is created whenever needed and destroyed at the end of its computation task. 
-[@tbl:pool] compares the running time of a solution based on our 
+\autoref{tbl:pool} compares the running time of a solution based on our 
 thread pool with the former approach. The run-time improvements are highly 
 dataset dependent, but always measurable in the considered scenarios.
 
@@ -316,7 +316,7 @@ structures, making the implementation more cache-friendly, and directly
 iterating over data without any transformation, hence reducing the pressure 
 on the memory sub-system.
 
-::: {#tbl:pool}
+:::
                   **giotto-ph backend**                                   
   ------------- ----------------------- --------------- ----------------- ---------------
                      **no thread pool**                   **thread pool** 
@@ -332,7 +332,7 @@ on the memory sub-system.
   : Running times, expressed in seconds, with and without the thread pool. $N$
   denotes the number of threads used. All information regarding the datasets 
   presented here are described in [@sec:experiments] and summarized in 
-  [@tbl:datasets].
+  [@tbl:datasets].\label{tbl:pool}
 :::
 
 ## Python Interface {#sec:python}
