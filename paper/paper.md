@@ -213,7 +213,7 @@ In this context, we present
 [*giotto-ph*](https://github.com/giotto-ai/giotto-ph), a Python package built 
 on top of a C++ backend that computes PH barcodes for VR filtrations on the CPU. 
 To the best of our knowledge, this is the first package fully integrating the 
-three ideas described in Section \ref{sec:related_work} (lock-free reduction, 
+three ideas described in [@sec:related_work] (lock-free reduction, 
 parallelized search for apparent pairs, edge collapses) in a single portable, 
 easy-to-use library. We remark that, after the release of our code and of the 
 first version of this paper, we learned about a very recent thesis 
@@ -258,12 +258,12 @@ homology dimensions, than ever before.
 
 ![*giotto-ph* consists of a C++ backend and a Python frontend. 
 The Python interface is based on *Ripser.py* [@ctralie2018ripser] (see 
-Section \ref{sec:python} for details). The figure also shows the 
+[@sec:python] for details). The figure also shows the 
 inheritance of *giotto-ph*'s C++ backend from pre-dating implementations.
 \label{fig:lib}](architecture_bpj.svg){width=100%}
 
 *giotto-ph* is a library dedicated to the efficient computation of PH of VR 
-filtrations (see Section \ref{sec:need}). It inherits and extends ideas and 
+filtrations (see [@sec:need]). It inherits and extends ideas and 
 code from many sources; \autoref{fig:lib} gives a visual representation of the 
 most important ones among them. Our aim with *giotto-ph* is to provide an 
 alternative to the excellent *Ripser.py* library, retaining several of the 
@@ -300,16 +300,16 @@ starts, and the same threads are reused for different computations during
 the program's life span. This approach enables better amortization of the 
 cost of the short-lived threads used in [@morozov2020lock], where one thread 
 is created whenever needed and destroyed at the end of its computation task. 
-Table \ref{tbl:pool} compares the running time of a solution based on our 
+[@tbl:pool] compares the running time of a solution based on our 
 thread pool with the former approach. The run-time improvements are highly 
 dataset dependent, but always measurable in the considered scenarios.
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
-(see Section \ref{sec:related_work}), implemented so far only in the *GUDHI*
+(see [@sec:related_work]), implemented so far only in the *GUDHI*
 library [@gudhi:Collapse]. Our implementation focuses on performance and removes 
 the dependencies on the *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] 
 libraries. *giotto-ph*'s EC is more than 1.5 times faster than the original 
-version as reported in Table \ref{tbl:collapser}. It also supports weighted 
+version as reported in [@tbl:collapser]. It also supports weighted 
 graphs with arbitrary (possibly non-positive) edge weights as well as 
 arbitrary node weights. Improvements were achieved mainly by reworking data 
 structures, making the implementation more cache-friendly, and directly 
@@ -331,8 +331,8 @@ on the memory sub-system.
 
   : Running times, expressed in seconds, with and without the thread pool. $N$
   denotes the number of threads used. All information regarding the datasets 
-  presented here are described in Section \ref{sec:experiments} and summarized in 
-  Table \ref{tbl:datasets}.
+  presented here are described in [@sec:experiments] and summarized in 
+  [@tbl:datasets].
 :::
 
 ## Python Interface {#sec:python}
@@ -347,7 +347,7 @@ notable improvements:
     the maximum homology dimension to compute is high, the initial run-time 
     overhead due to EC is often not compensated for by the resulting 
     speed-up in the downstream reduction steps (see the end of 
-    Section \ref{sec:related_work}). However, users can easily enable it by means of the 
+    [@sec:related_work]). However, users can easily enable it by means of the 
     `collapse_edges` optional argument. In Table ??? we will 
     show the difference in run-times when this option is active. See also 
     "Support for enclosing radius", below.
@@ -364,7 +364,7 @@ notable improvements:
     maximum distance in the data, this can lead to dramatic improvements in 
     run-time and memory usage, as observed in 
     [@henselmanpetrusek2020matroids]. (For instance, the barcode 
-    computation for the `random16` dataset (see Table \ref{tbl:datasets}) up 
+    computation for the `random16` dataset (see [@tbl:datasets]) up 
     to dimension $7$ would not be completed after two hours without the 
     enclosing radius optimization; with it, the run-time drops to seconds. 
     Not all datasets can be expected to witness equally impressive 
@@ -377,7 +377,7 @@ notable improvements:
     interface is that, when both the enclosing radius is computed and EC is 
     enabled, the input distance matrix/weighted graph is thresholded 
     *before* being passed to the EC backend. As we experimentally find and 
-    report in Section \ref{sec:collapser}, on several datasets this can 
+    report in [@sec:collapser], on several datasets this can 
     lead to substantial run-time improvements for the EC step.
 
   - Weighted VR filtrations. While standard stability results for VR barcodes 
@@ -408,7 +408,7 @@ All experiments presented in this paper were performed on a machine running
 Linux CentOS 7.9.2009 with kernel 5.4.92, equipped with two Intel® XEON® 
 Gold 6248R (24 physical cores each) and a total of 128 GB of RAM. 
 
-We present measures on the datasets of Table \ref{tbl:datasets} because they 
+We present measures on the datasets of [@tbl:datasets] because they 
 are publicly available, and they are used in publications [@Otter_2017; 
 @bauer2021ripser] describing established algorithms, making them a 
 representative benchmark set and facilitating comparisons among competing 
@@ -478,7 +478,7 @@ multiple threads is `sphere3`. The version in [@morozov2020lock] performs
 better and better on `sphere3` when increasing the number of parallel 
 resources, while ours (see \autoref{fig:scaling}) does not. The main culprit is
 that, while in [@morozov2020lock] parallel resources are allocated only when 
-needed in the computation, our thread pool (see Section \ref{sec:Cpp_backend}) will 
+needed in the computation, our thread pool (see [@sec:Cpp_backend]) will 
 allocate all the parallel resources indicated by the user ahead of time. Our 
 approach is most beneficial when the allocated resources can be reused during 
 the computation, and this is true e.g. when computing homology dimensions in 
@@ -530,8 +530,8 @@ Table ??? compares *Ripser v1.2* and *giotto-ph* when
 increasing the homology dimension parameter. We included the measurements
 using EC to show the potential benefits. It is important to note that
 timings reported using EC do not include EC processing time; the interested
-reader can find them in Table \ref{tbl:collapser}. The first dimension reported in 
-Table ??? is the one in the setup of Table \ref{tbl:datasets}.
+reader can find them in [@tbl:collapser]. The first dimension reported in 
+Table ??? is the one in the setup of [@tbl:datasets].
 
 `sphere3` and `random16` are the only datasets where the Maximal Index (**MI**)
 (i.e. the maximum number of retrievable entries) is not attained. `sphere3`
@@ -539,7 +539,7 @@ is a highly regular dataset and computing higher homology dimensions will
 not yield interesting results. `random16` produces no barcodes at dimension
 $20$. We arbitrarily decided to stop at dimension $10$ and report the data.
 
-Table \ref{tbl:datasets} shows that, in general, pre-processing with EC
+[@tbl:datasets] shows that, in general, pre-processing with EC
 leads to a reduction in later run-times. The only exception is the `sphere3`
 dataset, where EC is slightly detrimental. The reason for this is
 implementational in nature as we now explain. The EC step takes as input the
@@ -553,25 +553,25 @@ format.
 ## Edge Collapser {#sec:collapser}
 
 We now report experimental findings concerning our EC implementation. These 
-are summarized in Table \ref{tbl:collapser}, where the third column 
+are summarized in [@tbl:collapser], where the third column 
 demonstrates that our solution is always faster than *GUDHI*'s original one 
 on the datasets considered.
 
-We remind the reader that, as explained in Section \ref{sec:python}, a 
+We remind the reader that, as explained in [@sec:python], a 
 novelty of our implementation is the use of the enclosing radius computation to
 shorten the run-time of the EC step even beyond what is already made possible 
 by our use of faster routines and data structures. The experimental impact of 
-this enhancement is shown in the last column of Table \ref{tbl:collapser}. One would 
+this enhancement is shown in the last column of [@tbl:collapser]. One would 
 expect that the more "random" datasets, where "central points" are likely to be 
 present, will benefit the most from thresholding by the enclosing radius. Among 
-our standard datasets from Table \ref{tbl:datasets}, `random16`, `o3_1024` and `o3_4096` 
+our standard datasets from [@tbl:datasets], `random16`, `o3_1024` and `o3_4096` 
 are random datasets, but we do not witness such an impact. While, in the case 
 of `random16`, the reason is likely that the dataset it too small ($50$ 
 points), in the case of the `o3` datasets the reason is that a threshold lower 
 than the enclosing radius is provided, meaning that the enclosing radius 
 optimization is not used at all there. To demonstrate that our expectation is 
 valid despite the limitations caused by our choice of datasets and 
-configurations, we have added an entry to Table \ref{tbl:datasets}, representing a 
+configurations, we have added an entry to [@tbl:datasets], representing a 
 dataset of $3000$ points sampled from the uniform distribution on the unit cube 
 in $\mathbb{R}^3$. Together with `sphere3`, this example shows that large gains 
 can be made by using the enclosing radius on certain datasets.
