@@ -614,6 +614,13 @@ modular way. We also plan to add features (e.g., simplex pairs and essential
 simplices) needed for back-propagation in a deep learning context, and seamless 
 integration with frameworks such as [*PyTorch*](https://pytorch.org/).
 
+# Acknowledgements
+
+We thank Anibal Medina-Mardones and Kathryn Hess Bellwald for numerous fruitful 
+discussions, as well as Ulrich Bauer for very helpful conversations about 
+\textit{Ripser}. This work was supported by the Swiss Innovation Agency 
+(Innosuisse project 41665.1 IP-ICT).
+
 # References
 
 
