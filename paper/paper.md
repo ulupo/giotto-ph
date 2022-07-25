@@ -307,15 +307,13 @@ dataset dependent, but always measurable in the considered scenarios.
 : Comparison of programming languages used in the publishing tool.
   []{label="proglangs"}
 
-\autoref{proglangs}
-
 | Language | Typing          | Garbage Collected | Evaluation | Created |
 |----------|:---------------:|:-----------------:|------------|---------|
 | Haskell  | static, strong  | yes               | non-strict | 1990    |
 | Lua      | dynamic, strong | yes               | strict     | 1993    |
 | C        | static, weak    | no                | strict     | 1972    |
 
-
+\autoref{proglangs}
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
 (see [@sec:related_work]), implemented so far only in the *GUDHI*
