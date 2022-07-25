@@ -51,7 +51,7 @@ implementation of Boissonnat and Pritam's *Edge Collapser*, which can be
 used as a pre-processing step to dramatically reduce overall run-times in 
 certain scenarios. Our contribution is twofold: on the one hand, we 
 integrate existing state-of-the-art ideas coherently in a single library and 
-provide Python bindings to the C$++$ code. On the other hand, we increase 
+provide Python bindings to the C++ code. On the other hand, we increase 
 parallelization opportunities and improve overall performance by adopting 
 more efficient data structures. Our persistent homology backend establishes 
 a new state of the art, surpassing even GPU-accelerated implementations such 
@@ -182,7 +182,7 @@ harvest in this work by integrating the aforementioned ideas from
 
 All implementations presented in this subsection (barring [@nigmetov2020oineus], 
 which also provides some Python bindings) are written in low-level languages 
-(C$++$, CUDA). However, researchers today make wide use of higher-level languages 
+(C++, CUDA). However, researchers today make wide use of higher-level languages 
 – Python, for instance, is the dominant one in several fields. It is therefore 
 natural that libraries have been developed to couple Python's ease of use with 
 the high performance provided by these pieces of code. *Ripser.py* 
@@ -210,7 +210,7 @@ EC has already been integrated into the *GUDHI* library
 
 In this context, we present 
 [*giotto-ph*](https://github.com/giotto-ai/giotto-ph), a Python package built 
-on top of a C$++$ backend that computes PH barcodes for VR filtrations on the CPU. 
+on top of a C++ backend that computes PH barcodes for VR filtrations on the CPU. 
 To the best of our knowledge, this is the first package fully integrating the 
 three ideas described in [@sec:related_work] (lock-free reduction, 
 parallelized search for apparent pairs, edge collapses) in a single portable, 
@@ -255,10 +255,10 @@ homology dimensions, than ever before.
 
 # Implementation
 
-![*giotto-ph* consists of a C$++$ backend and a Python frontend. 
+![*giotto-ph* consists of a C++ backend and a Python frontend. 
 The Python interface is based on *Ripser.py* [@ctralie2018ripser] (see 
 [@sec:python] for details). The figure also shows the 
-inheritance of *giotto-ph*'s C$++$ backend from pre-dating implementations.
+inheritance of *giotto-ph*'s C++ backend from pre-dating implementations.
 \label{fig:lib}](architecture_bpj.svg){width=100%}
 
 *giotto-ph* is a library dedicated to the efficient computation of PH of VR 
@@ -267,9 +267,9 @@ code from many sources; \autoref{fig:lib} gives a visual representation of the
 most important ones among them. Our aim with *giotto-ph* is to provide an 
 alternative to the excellent *Ripser.py* library, retaining several of the 
 latter's advantages, namely portability and ease of use, while replacing the 
-C$++$ backend with a new parallel and higher-performance version. 
+C++ backend with a new parallel and higher-performance version. 
 
-## C$++$ backend {#sec:Cpp_backend}
+## C++ backend {#sec:Cpp_backend}
 
 The implementation of *giotto-ph*'s backend parallel algorithm is heavily 
 inspired by [@morozov2020lock], a functional proof of concept of 
@@ -314,7 +314,7 @@ dataset dependent, but always measurable in the considered scenarios.
 
 \autoref{proglangs}
 
-The final component in our C$++$ backend is a rewriting of the EC algorithm 
+The final component in our C++ backend is a rewriting of the EC algorithm 
 (see [@sec:related_work]), implemented so far only in the *GUDHI*
 library [@gudhi:Collapse]. Our implementation focuses on performance and removes 
 the dependencies on the *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] 
