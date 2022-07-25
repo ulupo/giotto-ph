@@ -321,7 +321,7 @@ on the memory sub-system.
                   **giotto-ph backend**                                   
   ------------- ----------------------- --------------- ----------------- ---------------
                      **no thread pool**                   **thread pool** 
-  **dataset**              $\bm{N = 8}$   $\bm{N = 48}$      $\bm{N = 8}$   $\bm{N = 48}$
+  **dataset**                   $N = 8$       $N = 48$            $N = 8$        $N = 48$
   `sphere3`                         0.4             0.4               0.4            0.38
   `dragon`                          1.2             1.2               1.3             1.3
   `o3_1024`                         0.4            0.18               0.4            0.17
