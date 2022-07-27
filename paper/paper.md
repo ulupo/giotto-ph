@@ -212,10 +212,11 @@ In this context, we present
 [*giotto-ph*](https://github.com/giotto-ai/giotto-ph), a Python package built 
 on top of a C++ backend that computes PH barcodes for VR filtrations on the CPU. 
 To the best of our knowledge, this is the first package fully integrating the 
-three ideas described in \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}} (lock-free reduction, 
-parallelized search for apparent pairs, edge collapses) in a single portable, 
-easy-to-use library. We remark that, after the release of our code and of the 
-first version of this paper, we learned about a very recent thesis 
+three ideas described in 
+\hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}} (lock-free 
+reduction, parallelized search for apparent pairs, edge collapses) in a single 
+portable, easy-to-use library. We remark that, after the release of our code 
+and of the first version of this paper, we learned about a very recent thesis 
 [@tulchinskii2021fast] and associated 
 [publicly available code](https://github.com/ArGintum/PersistenceHomology)
 (retrieved 1 August 2021) in which a very similar program to ours has been 
@@ -257,17 +258,18 @@ homology dimensions, than ever before.
 
 ![*giotto-ph* consists of a C++ backend and a Python frontend. 
 The Python interface is based on *Ripser.py* [@ctralie2018ripser] (see 
-\autoref{sec:python} for details). The figure also shows the 
-inheritance of *giotto-ph*'s C++ backend from pre-dating implementations.
-\label{fig:lib}](architecture_bpj.svg){width=100%}
+\hyperref[sec:python]{``Python interface"\ref*{sec:python}} for details). The 
+figure also shows the inheritance of *giotto-ph*'s C++ backend from pre-dating 
+implementations. \label{fig:lib}](architecture_bpj.svg){width=100%}
 
 *giotto-ph* is a library dedicated to the efficient computation of PH of VR 
-filtrations (see \autoref{sec:need}). It inherits and extends ideas and 
-code from many sources; \autoref{fig:lib} gives a visual representation of the 
-most important ones among them. Our aim with *giotto-ph* is to provide an 
-alternative to the excellent *Ripser.py* library, retaining several of the 
-latter's advantages, namely portability and ease of use, while replacing the 
-C++ backend with a new parallel and higher-performance version. 
+filtrations (see \hyperref[sec:need]{``Statement of need"\ref*{sec:need}}). It 
+inherits and extends ideas and code from many sources; \autoref{fig:lib} gives 
+a visual representation of the most important ones among them. Our aim with 
+*giotto-ph* is to provide an alternative to the excellent *Ripser.py* library, 
+retaining several of the latter's advantages, namely portability and ease of 
+use, while replacing the C++ backend with a new parallel and higher-performance 
+version. 
 
 ## C++ backend \label{sec:Cpp_backend}
 
@@ -304,14 +306,15 @@ pool with the former approach. The run-time improvements are highly dataset
 dependent, but always measurable in the scenarios considered.
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
-(see \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}), implemented so far only in the *GUDHI* library 
-[@gudhi:Collapse]. Our implementation focuses on performance and removes the
-dependencies on the *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] libraries. 
-It also supports weighted graphs with arbitrary (possibly non-positive) edge 
-weights as well as arbitrary node weights. Improvements were achieved mainly by 
-reworking data structures, making the implementation more cache-friendly, and 
-directly iterating over data without any transformation, hence reducing the 
-pressure on the memory sub-system.
+(see \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}), 
+implemented so far only in the *GUDHI* library [@gudhi:Collapse]. Our 
+implementation focuses on performance and removes the dependencies on the 
+*Boost* [@BoostLibrary] and *Eigen* [@eigenweb] libraries. It also supports 
+weighted graphs with arbitrary (possibly non-positive) edge weights as well as 
+arbitrary node weights. Improvements were achieved mainly by reworking data 
+structures, making the implementation more cache-friendly, and directly 
+iterating over data without any transformation, hence reducing the pressure on 
+the memory sub-system.
 
 \begin{table}
 \centering
@@ -335,7 +338,7 @@ presented here is described in Section \ref{sec:experiments} and summarized in
 \end{tabular}
 \end{table}
 
-## Python Interface \label{sec:python}
+## Python interface \label{sec:python}
 
 Our Python interface is based on *Ripser.py* [@ctralie2018ripser]. While it 
 lacks some of *Ripser.py*'s features, such as the support for "greedy 
@@ -347,10 +350,9 @@ notable improvements:
     the maximum homology dimension to compute is high, the initial run-time 
     overhead due to EC is often not compensated for by the resulting 
     speed-up in the downstream reduction steps (see the end of 
-    \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}). However, users can easily enable it by means of the 
-    `collapse_edges` optional argument. In Table ??? we will 
-    show the difference in run-times when this option is active. See also 
-    "Support for enclosing radius", below.
+    \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}). 
+  - However, users can easily enable it by means of the `collapse_edges` 
+    optional argument. See also "Support for enclosing radius", below.
 
   - Support for enclosing radius. The *(minimum) enclosing radius* of a 
     finite metric space is the radius of the smallest enclosing ball of that 
@@ -481,13 +483,14 @@ multiple threads is `sphere3`. The version in [@morozov2020lock] performs
 better and better on `sphere3` when increasing the number of parallel 
 resources, while ours (see \autoref{fig:scaling}) does not. The main culprit is
 that, while in [@morozov2020lock] parallel resources are allocated only when 
-needed in the computation, our thread pool (see \autoref{sec:Cpp_backend}) will 
-allocate all the parallel resources indicated by the user ahead of time. Our 
-approach is most beneficial when the allocated resources can be reused during 
-the computation, and this is true e.g. when computing homology dimensions in 
-degree $2$ and above. However, when computing only up to dimension $1$, it is 
-only necessary to allocate the parallel resources once, and an on-the-fly 
-approach such as the one in [@morozov2020lock] can be faster. Another logically 
+needed in the computation, our thread pool (see 
+\hyperref[sec:Cpp_backend]{``C++ backend"\ref*{sec:Cpp_backend}}) will allocate
+all the parallel resources indicated by the user ahead of time. Our approach is 
+most beneficial when the allocated resources can be reused during the 
+computation, and this is true e.g. when computing homology dimensions in degree
+$2$ and above. However, when computing only up to dimension $1$, it is only 
+necessary to allocate the parallel resources once, and an on-the-fly approach 
+such as the one in [@morozov2020lock] can be faster. Another logically 
 independent reason for this observed performance loss has to do with apparent 
 pairs: we remind the reader that the implementation in [@morozov2020lock] is 
 based upon *Ripser v1.1* which, unlike *Ripser v1.2* considered here, did not 
