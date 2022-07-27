@@ -140,32 +140,21 @@ particular no implementation of the emergent *or* apparent pair optimization is
 present there at this time. (At the time of writing, this library is in version 
 1.0. We were not aware of its existence during the development of our code.)
 
-Zhang *et al.*'s *Ripser++* [@zhang2020gpuaccelerated] implements the idea of 
-finding apparent pairs in parallel on a GPU to accelerate the computation of VR 
-barcodes. Despite this, *Ripser++* is not fully parallel. For each dimension to 
-process, it divides the computation into three sub-tasks: 
-"*filtration construction and clearing*", "*finding apparent pairs*" and 
-"*sub-matrix reduction*". The last of these steps is not parallel, and it is 
-executed on the CPU. According to 
-[Amdahl’s law](https://en.wikipedia.org/wiki/Amdahl's\_law) this processing 
-sequence is expected to yield only diminishing returns when augmenting the 
-number of parallel resources. Although performance gains have been demonstrated 
-in [@zhang2020gpuaccelerated] – particularly when using high-end GPUs – there 
+*Ripser++* [@zhang2020gpuaccelerated] implements the idea of finding apparent 
+pairs in parallel on a GPU to accelerate the computation of VR barcodes. 
+Despite this, *Ripser++* is not fully parallel. For each dimension to process, 
+it divides the computation into three sub-tasks: "*filtration construction and 
+clearing*", "*finding apparent pairs*" and "*sub-matrix reduction*". The last 
+of these steps is not parallel, and it is executed on the CPU. Hence, there 
 is room for extending parallelism to the third sub-task above, which we try to 
 harvest in this work by integrating the aforementioned ideas from 
 [@morozov2020towards].
 
-All implementations presented in this subsection (barring [@nigmetov2020oineus], 
-which also provides some Python bindings) are written in low-level languages 
-(C++, CUDA). However, researchers today make wide use of higher-level languages 
-– Python, for instance, is the dominant one in several fields. It is therefore 
-natural that libraries have been developed to couple Python's ease of use with 
-the high performance provided by these pieces of code. *Ripser.py* 
-[@ctralie2018ripser] is probably the most notable of these implementations, 
-providing an intuitive interface for VR filtrations wrapping *Ripser* at its 
-core. The authors of the library forked the original *Ripser* implementation 
-and added support for non-zero birth times, as well as the possibility to 
-compute and retrieve cocycles.
+All implementations presented in this subsection so far (barring 
+[@nigmetov2020oineus], which also provides some Python bindings) are written in 
+low-level languages (C++, CUDA). *Ripser.py* [@ctralie2018ripser] contains a 
+modified version of *Ripser* with support for non-zero birth times and for the 
+retrieval of cocycles, as well as a convenient Python interface.
 
 Meanwhile, in 2020, Boissonnat and Pritam presented a new algorithm they called 
 *Edge Collapser* (EC) [@boissonnat2020edge]. Independently of the code used to 
