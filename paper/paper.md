@@ -299,7 +299,7 @@ starts, and the same threads are reused for different computations during
 the program's life span. This approach enables better amortization of the 
 cost of the short-lived threads used in [@morozov2020lock], where one thread 
 is created whenever needed and destroyed at the end of its computation task. 
-Table \ref{tbl:pool} compares the running time of a solution based on our 
+Table \autoref{tbl:pool} compares the running time of a solution based on our 
 thread pool with the former approach. The run-time improvements are highly 
 dataset dependent, but always measurable in the considered scenarios.
 
