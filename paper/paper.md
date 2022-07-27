@@ -70,7 +70,7 @@ a wide variety of computational contexts, such as geometric inference
 [@edelsbrunner2014short; @boissonnat2018geometric], signal processing 
 [@robinson2014topological; @perea2015sliding], data visualization 
 [@tierny2018topological], and, more generally, data analysis 
-[@carlsson2009topology; chazal2021introduction] and machine learning 
+[@carlsson2009topology; @chazal2021introduction] and machine learning 
 [@hensel2021survey]. Among the main invariants described by this theory, the 
 (*persistence*) *barcode* [@frosini1990shapes; @frosini1992measuring; 
 @barannikov1994morse; @robins1999approximations; 
@@ -80,10 +80,10 @@ disappearance of holes, voids, or higher-dimensional topological features in
 data, throughout entire ranges of parameters, (b) its succinct nature and ease 
 of representation, as it simply consists of a (typically small) collection of 
 intervals of the real line, (c) its provable robustness under perturbations of 
-the input data [@damico2003optimal; cohen-steiner2007stability], and (d) its 
+the input data [@damico2003optimal; @cohen-steiner2007stability], and (d) its 
 amenability to computation and algorithmic optimization, as demonstrated by the 
 large number of existing implementations – see Sec. 1 in [@bauer2021ripser] for 
-a review, and [@aggarwal2021dory; vonbromssen2021computing] for recent entries 
+a review, and [@aggarwal2021dory; @vonbromssen2021computing] for recent entries 
 not mentioned there.
 
 Despite these successes, the computation of barcodes remains a challenge when
