@@ -304,16 +304,14 @@ pool with the former approach. The run-time improvements are highly dataset
 dependent, but always measurable in the scenarios considered.
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
-(see [@sec:related_work]), implemented so far only in the *GUDHI*
-library [@gudhi:Collapse]. Our implementation focuses on performance and removes 
-the dependencies on the *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] 
-libraries. *giotto-ph*'s EC is more than 1.5 times faster than the original 
-version as reported in [@tbl:collapser]. It also supports weighted 
-graphs with arbitrary (possibly non-positive) edge weights as well as 
-arbitrary node weights. Improvements were achieved mainly by reworking data 
-structures, making the implementation more cache-friendly, and directly 
-iterating over data without any transformation, hence reducing the pressure 
-on the memory sub-system.
+(see [@sec:related_work]), implemented so far only in the *GUDHI* library 
+[@gudhi:Collapse]. Our implementation focuses on performance and removes the
+dependencies on the *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] libraries. 
+It also supports weighted graphs with arbitrary (possibly non-positive) edge 
+weights as well as arbitrary node weights. Improvements were achieved mainly by 
+reworking data structures, making the implementation more cache-friendly, and 
+directly iterating over data without any transformation, hence reducing the 
+pressure on the memory sub-system.
 
 \begin{table}
 \centering
@@ -535,9 +533,9 @@ seconds) to complete the PH computation.
 Table ??? compares *Ripser v1.2* and *giotto-ph* when
 increasing the homology dimension parameter. We included the measurements
 using EC to show the potential benefits. It is important to note that
-timings reported using EC do not include EC processing time; the interested
-reader can find them in [@tbl:collapser]. The first dimension reported in 
-Table ??? is the one in the setup of \autoref{tbl:datasets}.
+timings reported using EC do not include EC processing time. The first 
+dimension reported in Table ??? is the one in the setup of 
+\autoref{tbl:datasets}.
 
 `sphere3` and `random16` are the only datasets where the Maximal Index (**MI**)
 (i.e. the maximum number of retrievable entries) is not attained. `sphere3`
@@ -555,57 +553,6 @@ sparse matrix. Dense representations have better cache behaviour than sparse
 ones, and thus can lead to faster computations than highly filled sparse
 ones. We are working on a heuristic to automatically select the best data
 format.
-
-## Edge Collapser {#sec:collapser}
-
-We now report experimental findings concerning our EC implementation. These 
-are summarized in [@tbl:collapser], where the third column 
-demonstrates that our solution is always faster than *GUDHI*'s original one 
-on the datasets considered.
-
-We remind the reader that, as explained in [@sec:python], a 
-novelty of our implementation is the use of the enclosing radius computation to
-shorten the run-time of the EC step even beyond what is already made possible 
-by our use of faster routines and data structures. The experimental impact of 
-this enhancement is shown in the last column of [@tbl:collapser]. One would 
-expect that the more "random" datasets, where "central points" are likely to be 
-present, will benefit the most from thresholding by the enclosing radius. Among 
-our standard datasets from \autoref{tbl:datasets}, `random16`, `o3_1024` and 
-`o3_4096` are random datasets, but we do not witness such an impact. While, in 
-the case of `random16`, the reason is likely that the dataset it too small ($50$ 
-points), in the case of the `o3` datasets the reason is that a threshold lower 
-than the enclosing radius is provided, meaning that the enclosing radius 
-optimization is not used at all there. To demonstrate that our expectation is 
-valid despite the limitations caused by our choice of datasets and 
-configurations, we have added an entry to \autoref{tbl:datasets}, representing a 
-dataset of $3000$ points sampled from the uniform distribution on the unit cube 
-in $\mathbb{R}^3$. Together with `sphere3`, this example shows that large gains 
-can be made by using the enclosing radius on certain datasets.
-
-::: {#tbl:collapser}
-  **dataset**     ***GUDHI* EC**   ***giotto-ph* EC** (speedup)   ***giotto-ph* EC with encl. rad.** (speedup) 
-  ------------- ---------------- ------------------------------ ---------------------------------------------- --
-  `sphere3`                  1.6                     0.9 (1.78)                                     0.9 (1.78) 
-  `dragon`                    63                      36 (1.75)                                      28 (2.25) 
-  `o3_1024`                  0.2                    0.13 (1.53)                                  0.13\* (1.53) 
-  `random16`               0.004                   0.001 (4.00)                                   0.001 (4.00) 
-  `fractal`                 1.32                     0.8 (1.65)                                     0.8 (1.65) 
-  `o3_4096`                  2.1                     1.2 (1.75)                                   1.2\* (1.75) 
-  `torus4`                    10                     6.7 (1.49)                                   6.7\* (1.49) 
-                             180                     125 (1.44)                                      78 (2.31) 
-
-  : Run-time comparison between *GUDHI*'s implementation
-  [@gudhi:Collapse] of the EC algorithm of Boissonnat and Pritam
-  [@boissonnat2020edge] and *giotto-ph*'s implementation. The last
-  column reports run-times when sparsifying according to the enclosing
-  radius before calling *giotto-ph*'s EC, which is the default behaviour
-  when no threshold is provided by the user. All execution times are in
-  seconds, while speedups are ratios. Cells marked with an asterisk mean
-  that a threshold is provided and therefore the enclosing radius is not
-  computed by default. The last entry is unique to this table and better
-  demonstrates the impact of the enclosing radius optimization on
-  favourable datasets and configurations.
-:::
 
 # Conclusion and future work
 
