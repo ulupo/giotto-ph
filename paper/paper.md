@@ -320,7 +320,7 @@ on the memory sub-system.
 \caption{Running times, expressed in seconds, with and without the thread pool. 
 $N$ denotes the number of threads used. All information regarding the datasets 
 presented here is described in Section \ref{sec:experiments} and summarized in 
-Table \ref{tbl:datasets}.}
+\autoref{tbl:datasets}.}
 \label{tbl:pool}
 \begin{tabular}{lrrrr}
     \cline{2-5} & \multicolumn{4}{c}{\textbf{\textit{giotto-ph} backend}} \\ \cline{2-5} & \multicolumn{2}{c}{\textbf{no thread pool}} & \multicolumn{2}{c}{\textbf{thread pool}} \\ \hline
@@ -364,7 +364,7 @@ notable improvements:
     maximum distance in the data, this can lead to dramatic improvements in 
     run-time and memory usage, as observed in 
     [@henselmanpetrusek2020matroids]. (For instance, the barcode 
-    computation for the `random16` dataset (see [@tbl:datasets]) up 
+    computation for the `random16` dataset (see \autoref{tbl:datasets}) up 
     to dimension $7$ would not be completed after two hours without the 
     enclosing radius optimization; with it, the run-time drops to seconds. 
     Not all datasets can be expected to witness equally impressive 
@@ -408,7 +408,7 @@ All experiments presented in this paper were performed on a machine running
 Linux CentOS 7.9.2009 with kernel 5.4.92, equipped with two Intel® XEON® 
 Gold 6248R (24 physical cores each) and a total of 128 GB of RAM. 
 
-We present measures on the datasets of [@tbl:datasets] because they 
+We present measures on the datasets of \autoref{tbl:datasets} because they 
 are publicly available, and they are used in publications [@Otter_2017; 
 @bauer2021ripser] describing established algorithms, making them a 
 representative benchmark set and facilitating comparisons among competing 
@@ -418,20 +418,24 @@ option active. The `dim` parameter corresponds to the maximum dimension for
 which we compute PH, and the `coeff` parameter corresponds to the prime 
 field of coefficients (in our tests, this is always $\mathbb{F}_2$).
 
-::: {#tbl:datasets}
-  **dataset**     **size** **threshold**     **dim**   **coeff**
-  ------------- ---------- --------------- --------- -----------
-  `sphere3`            192                         2           2
-  `dragon`            2000                         1           2
-  `o3_1024`           1024 1.8                     3           2
-  `random16`            50                         7           2
-  `fractal`            512                         2           2
-  `o3_4096`           4096 1.4                     3           2
-  `torus4`           50000 0.15                    2           2
-
-  : Datasets used for benchmarking. "Size" means the number of points in
-  the dataset.
-:::
+\begin{table}
+\centering
+\caption{Datasets used for benchmarking. ``Size" means the number of points in 
+the dataset.}
+\label{tbl:datasets}
+\begin{tabular}{lrrrr}
+    \toprule
+    \textbf{dataset} & \textbf{size} & \textbf{threshold} & \textbf{dim} & \textbf{coeff} \\ \hline
+    \texttt{sphere3}  & 192   &      & 2 & 2 \\ \hline
+    \texttt{dragon}   & 2000  &      & 1 & 2 \\ \hline
+    \texttt{o3\_1024} & 1024  & 1.8  & 3 & 2 \\ \hline
+    \texttt{random16} & 50    &      & 7 & 2 \\ \hline
+    \texttt{fractal}  & 512   &      & 2 & 2 \\ \hline
+    \texttt{o3\_4096} & 4096  & 1.4  & 3 & 2 \\ \hline
+    \texttt{torus4}   & 50000 & 0.15 & 2 & 2 \\
+    \bottomrule
+\end{tabular}
+\end{table}
 
 ## Comparison with state-of-the-art algorithms
 
@@ -531,7 +535,7 @@ increasing the homology dimension parameter. We included the measurements
 using EC to show the potential benefits. It is important to note that
 timings reported using EC do not include EC processing time; the interested
 reader can find them in [@tbl:collapser]. The first dimension reported in 
-Table ??? is the one in the setup of [@tbl:datasets].
+Table ??? is the one in the setup of \autoref{tbl:datasets}.
 
 `sphere3` and `random16` are the only datasets where the Maximal Index (**MI**)
 (i.e. the maximum number of retrievable entries) is not attained. `sphere3`
@@ -539,7 +543,7 @@ is a highly regular dataset and computing higher homology dimensions will
 not yield interesting results. `random16` produces no barcodes at dimension
 $20$. We arbitrarily decided to stop at dimension $10$ and report the data.
 
-[@tbl:datasets] shows that, in general, pre-processing with EC
+\autoref{tbl:datasets} shows that, in general, pre-processing with EC
 leads to a reduction in later run-times. The only exception is the `sphere3`
 dataset, where EC is slightly detrimental. The reason for this is
 implementational in nature as we now explain. The EC step takes as input the
@@ -564,14 +568,14 @@ by our use of faster routines and data structures. The experimental impact of
 this enhancement is shown in the last column of [@tbl:collapser]. One would 
 expect that the more "random" datasets, where "central points" are likely to be 
 present, will benefit the most from thresholding by the enclosing radius. Among 
-our standard datasets from [@tbl:datasets], `random16`, `o3_1024` and `o3_4096` 
-are random datasets, but we do not witness such an impact. While, in the case 
-of `random16`, the reason is likely that the dataset it too small ($50$ 
+our standard datasets from \autoref{tbl:datasets}, `random16`, `o3_1024` and 
+`o3_4096` are random datasets, but we do not witness such an impact. While, in 
+the case of `random16`, the reason is likely that the dataset it too small ($50$ 
 points), in the case of the `o3` datasets the reason is that a threshold lower 
 than the enclosing radius is provided, meaning that the enclosing radius 
 optimization is not used at all there. To demonstrate that our expectation is 
 valid despite the limitations caused by our choice of datasets and 
-configurations, we have added an entry to [@tbl:datasets], representing a 
+configurations, we have added an entry to \autoref{tbl:datasets}, representing a 
 dataset of $3000$ points sampled from the uniform distribution on the unit cube 
 in $\mathbb{R}^3$. Together with `sphere3`, this example shows that large gains 
 can be made by using the enclosing radius on certain datasets.
