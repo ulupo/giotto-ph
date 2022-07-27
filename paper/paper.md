@@ -420,7 +420,7 @@ field of coefficients (in our tests, this is always $\mathbb{F}_2$).
 
 \begin{table}
 \centering
-\caption{Datasets used for benchmarking. ``Size" means the number of points in 
+\caption{Datasets used for benchmarking. "Size" means the number of points in 
 the dataset.}
 \label{tbl:datasets}
 \begin{tabular}{lrrrr}
