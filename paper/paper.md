@@ -43,6 +43,21 @@ bibliography: paper.bib
 
 # Summary
 
+:::
+  **dataset**     ***GUDHI* EC**   ***giotto-ph* EC** (speedup)   ***giotto-ph* EC with encl. rad.** (speedup) 
+  ------------- ---------------- ------------------------------ ---------------------------------------------- --
+  `sphere3`                  1.6                     0.9 (1.78)                                     0.9 (1.78) 
+  `dragon`                    63                      36 (1.75)                                      28 (2.25) 
+  `o3_1024`                  0.2                    0.13 (1.53)                                  0.13\* (1.53) 
+  `random16`               0.004                   0.001 (4.00)                                   0.001 (4.00) 
+  `fractal`                 1.32                     0.8 (1.65)                                     0.8 (1.65) 
+  `o3_4096`                  2.1                     1.2 (1.75)                                   1.2\* (1.75) 
+  `torus4`                    10                     6.7 (1.49)                                   6.7\* (1.49) 
+                             180                     125 (1.44)                                      78 (2.31) 
+
+  : Caption
+:::
+
 We introduce *giotto-ph*, a high-performance, open-source software package 
 for the computation of Vietoris--Rips barcodes. *giotto-ph* is based on 
 Morozov and Nigmetov's lockfree (multicore) implementation of Ulrich Bauer's 
