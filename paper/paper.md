@@ -43,21 +43,6 @@ bibliography: paper.bib
 
 # Summary
 
-:::
-  **dataset**     ***GUDHI* EC**   ***giotto-ph* EC** (speedup)   ***giotto-ph* EC with encl. rad.** (speedup) 
-  ------------- ---------------- ------------------------------ ---------------------------------------------- --
-  `sphere3`                  1.6                     0.9 (1.78)                                     0.9 (1.78) 
-  `dragon`                    63                      36 (1.75)                                      28 (2.25) 
-  `o3_1024`                  0.2                    0.13 (1.53)                                  0.13\* (1.53) 
-  `random16`               0.004                   0.001 (4.00)                                   0.001 (4.00) 
-  `fractal`                 1.32                     0.8 (1.65)                                     0.8 (1.65) 
-  `o3_4096`                  2.1                     1.2 (1.75)                                   1.2\* (1.75) 
-  `torus4`                    10                     6.7 (1.49)                                   6.7\* (1.49) 
-                             180                     125 (1.44)                                      78 (2.31) 
-
-  : Caption
-:::
-
 We introduce *giotto-ph*, a high-performance, open-source software package 
 for the computation of Vietoris--Rips barcodes. *giotto-ph* is based on 
 Morozov and Nigmetov's lockfree (multicore) implementation of Ulrich Bauer's 
@@ -227,7 +212,7 @@ In this context, we present
 [*giotto-ph*](https://github.com/giotto-ai/giotto-ph), a Python package built 
 on top of a C++ backend that computes PH barcodes for VR filtrations on the CPU. 
 To the best of our knowledge, this is the first package fully integrating the 
-three ideas described in \autoref{sec:related_work} (lock-free reduction, 
+three ideas described in \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}} (lock-free reduction, 
 parallelized search for apparent pairs, edge collapses) in a single portable, 
 easy-to-use library. We remark that, after the release of our code and of the 
 first version of this paper, we learned about a very recent thesis 
@@ -319,7 +304,7 @@ pool with the former approach. The run-time improvements are highly dataset
 dependent, but always measurable in the scenarios considered.
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
-(see \autoref{sec:related_work}), implemented so far only in the *GUDHI* library 
+(see \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}), implemented so far only in the *GUDHI* library 
 [@gudhi:Collapse]. Our implementation focuses on performance and removes the
 dependencies on the *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] libraries. 
 It also supports weighted graphs with arbitrary (possibly non-positive) edge 
@@ -362,7 +347,7 @@ notable improvements:
     the maximum homology dimension to compute is high, the initial run-time 
     overhead due to EC is often not compensated for by the resulting 
     speed-up in the downstream reduction steps (see the end of 
-    \autoref{sec:related_work}). However, users can easily enable it by means of the 
+    \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}). However, users can easily enable it by means of the 
     `collapse_edges` optional argument. In Table ??? we will 
     show the difference in run-times when this option is active. See also 
     "Support for enclosing radius", below.
@@ -434,7 +419,7 @@ field of coefficients (in our tests, this is always $\mathbb{F}_2$).
 
 \begin{table}
 \centering
-\caption{Datasets used for benchmarking. "Size" means the number of points in 
+\caption{Datasets used for benchmarking. ``Size" means the number of points in 
 the dataset.}
 \label{tbl:datasets}
 \begin{tabular}{lrrrr}
