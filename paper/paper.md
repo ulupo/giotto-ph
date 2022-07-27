@@ -74,7 +74,7 @@ as *Ripser++* when using as few as 5–10 CPU cores. Furthermore, our
 implementation of *Edge Collapser* has fewer software dependencies and 
 improved run-times relative to *GUDHI*'s original implementation.
 
-# Statement of need {#sec:need}
+# Statement of need \label{sec:need}
 
 In recent years, *persistent homology* (PH) (see e.g. [@ghrist2007barcodes; 
 @edelsbrunner2008persistent; @edelsbrunner2014persistent; 
@@ -141,7 +141,7 @@ the desired barcode. PH computation for many other simplicial filtrations
 constructed from point clouds, finite metric spaces, or graphs are also 
 ultimately limited by similar considerations.
 
-# Related work {#sec:related_work}
+# Related work \label{sec:related_work}
 
 To the best of our knowledge, at the time of writing 
 [*Ripser*](https://github.com/Ripser/ripser) [@bauer2021ripser] is the *de 
@@ -227,7 +227,7 @@ In this context, we present
 [*giotto-ph*](https://github.com/giotto-ai/giotto-ph), a Python package built 
 on top of a C++ backend that computes PH barcodes for VR filtrations on the CPU. 
 To the best of our knowledge, this is the first package fully integrating the 
-three ideas described in [@sec:related_work] (lock-free reduction, 
+three ideas described in \autoref{sec:related_work} (lock-free reduction, 
 parallelized search for apparent pairs, edge collapses) in a single portable, 
 easy-to-use library. We remark that, after the release of our code and of the 
 first version of this paper, we learned about a very recent thesis 
@@ -272,19 +272,19 @@ homology dimensions, than ever before.
 
 ![*giotto-ph* consists of a C++ backend and a Python frontend. 
 The Python interface is based on *Ripser.py* [@ctralie2018ripser] (see 
-[@sec:python] for details). The figure also shows the 
+\autoref{sec:python} for details). The figure also shows the 
 inheritance of *giotto-ph*'s C++ backend from pre-dating implementations.
 \label{fig:lib}](architecture_bpj.svg){width=100%}
 
 *giotto-ph* is a library dedicated to the efficient computation of PH of VR 
-filtrations (see [@sec:need]). It inherits and extends ideas and 
+filtrations (see \autoref{sec:need}). It inherits and extends ideas and 
 code from many sources; \autoref{fig:lib} gives a visual representation of the 
 most important ones among them. Our aim with *giotto-ph* is to provide an 
 alternative to the excellent *Ripser.py* library, retaining several of the 
 latter's advantages, namely portability and ease of use, while replacing the 
 C++ backend with a new parallel and higher-performance version. 
 
-## C++ backend {#sec:Cpp_backend}
+## C++ backend \label{sec:Cpp_backend}
 
 The implementation of *giotto-ph*'s backend parallel algorithm is heavily 
 inspired by [@morozov2020lock], a functional proof of concept of 
@@ -319,7 +319,7 @@ pool with the former approach. The run-time improvements are highly dataset
 dependent, but always measurable in the scenarios considered.
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
-(see [@sec:related_work]), implemented so far only in the *GUDHI* library 
+(see \autoref{sec:related_work}), implemented so far only in the *GUDHI* library 
 [@gudhi:Collapse]. Our implementation focuses on performance and removes the
 dependencies on the *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] libraries. 
 It also supports weighted graphs with arbitrary (possibly non-positive) edge 
@@ -336,7 +336,7 @@ presented here is described in Section \ref{sec:experiments} and summarized in
 \autoref{tbl:datasets}.}
 \label{tbl:pool}
 \begin{tabular}{lrrrr}
-    \toprule
+    \hline
      & \multicolumn{2}{c}{\textbf{no thread pool}} & \multicolumn{2}{c}{\textbf{thread pool}} \\ \hline
     \textbf{dataset}    & $N = 8$ & $N = 48$ & $N = 8$ & $N = 48$ \\ \hline
     \texttt{sphere3}    & {0.4}   & {0.4}    & {0.4}   & 0.38     \\ \hline
@@ -346,11 +346,11 @@ presented here is described in Section \ref{sec:experiments} and summarized in
     \texttt{fractal}    & {0.9}   & {0.35}   & {0.9}   & 0.34     \\ \hline
     \texttt{o3\_4096}   & {6.9}   & {2.7}    & {6.9}   & 2.6      \\ \hline
     \texttt{torus4}     & {19}    & {14.7}   & {19.1}  & 14.3     \\
-    \bottomrule
+    \hline
 \end{tabular}
 \end{table}
 
-## Python Interface {#sec:python}
+## Python Interface \label{sec:python}
 
 Our Python interface is based on *Ripser.py* [@ctralie2018ripser]. While it 
 lacks some of *Ripser.py*'s features, such as the support for "greedy 
@@ -362,7 +362,7 @@ notable improvements:
     the maximum homology dimension to compute is high, the initial run-time 
     overhead due to EC is often not compensated for by the resulting 
     speed-up in the downstream reduction steps (see the end of 
-    [@sec:related_work]). However, users can easily enable it by means of the 
+    \autoref{sec:related_work}). However, users can easily enable it by means of the 
     `collapse_edges` optional argument. In Table ??? we will 
     show the difference in run-times when this option is active. See also 
     "Support for enclosing radius", below.
@@ -391,9 +391,8 @@ notable improvements:
     highly optimized *NumPy* functions. An element of novelty in our 
     interface is that, when both the enclosing radius is computed and EC is 
     enabled, the input distance matrix/weighted graph is thresholded 
-    *before* being passed to the EC backend. As we experimentally find and 
-    report in [@sec:collapser], on several datasets this can 
-    lead to substantial run-time improvements for the EC step.
+    *before* being passed to the EC backend. This can lead to substantial 
+    run-time improvements for the EC step.
 
   - Weighted VR filtrations. While standard stability results for VR barcodes 
     [@cohen-steiner2007stability; @chazal2009proximity] guarantee robustness 
@@ -417,7 +416,7 @@ notable improvements:
     operating systems, namely Linux, Mac OS X, and Windows, have been two of 
     our core objectives to facilitate the adoption of our library.
 
-# Experimental results {#sec:experiments}
+# Experimental results \label{sec:experiments}
 
 All experiments presented in this paper were performed on a machine running 
 Linux CentOS 7.9.2009 with kernel 5.4.92, equipped with two Intel® XEON® 
@@ -439,7 +438,7 @@ field of coefficients (in our tests, this is always $\mathbb{F}_2$).
 the dataset.}
 \label{tbl:datasets}
 \begin{tabular}{lrrrr}
-    \toprule
+    \hline
     \textbf{dataset} & \textbf{size} & \textbf{threshold} & \textbf{dim} & \textbf{coeff} \\ \hline
     \texttt{sphere3}  & 192   &      & 2 & 2 \\ \hline
     \texttt{dragon}   & 2000  &      & 1 & 2 \\ \hline
@@ -448,7 +447,7 @@ the dataset.}
     \texttt{fractal}  & 512   &      & 2 & 2 \\ \hline
     \texttt{o3\_4096} & 4096  & 1.4  & 3 & 2 \\ \hline
     \texttt{torus4}   & 50000 & 0.15 & 2 & 2 \\
-    \bottomrule
+    \hline
 \end{tabular}
 \end{table}
 
@@ -497,7 +496,7 @@ multiple threads is `sphere3`. The version in [@morozov2020lock] performs
 better and better on `sphere3` when increasing the number of parallel 
 resources, while ours (see \autoref{fig:scaling}) does not. The main culprit is
 that, while in [@morozov2020lock] parallel resources are allocated only when 
-needed in the computation, our thread pool (see [@sec:Cpp_backend]) will 
+needed in the computation, our thread pool (see \autoref{sec:Cpp_backend}) will 
 allocate all the parallel resources indicated by the user ahead of time. Our 
 approach is most beneficial when the allocated resources can be reused during 
 the computation, and this is true e.g. when computing homology dimensions in 
