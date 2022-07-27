@@ -324,18 +324,12 @@ permutations", it introduces the following improvements:
     matrix/weighted graph is thresholded *before* being passed to the EC 
     backend. This can lead to substantial run-time improvements for the EC step.
 
-  - Weighted VR filtrations. While standard stability results for VR barcodes 
-    [@cohen-steiner2007stability; @chazal2009proximity] guarantee robustness 
-    to small perturbations in the data, VR barcodes are generally *unstable* 
-    with respect to the insertion or deletion of even a single data point. 
-    Thus, even relatively small changes in the local density can greatly 
-    affect the resulting barcodes, rendering the vanilla VR persistence 
-    pipeline very vulnerable to statistical outliers. Distance-to-measure 
-    (DTM) based filtrations [@anai2020dtmbased] address this issue by 
-    re-weighting vertices and distances according to the local neighbourhood 
-    structure. The user can toggle DTM-based reweighting (or more general 
-    reweightings) by appropriately setting the optional parameters `weights` 
-    and `weight_params`.
+  - Weighted VR filtrations. Distance-to-measure (DTM) based filtrations 
+    [@anai2020dtmbased] address re-weight vertices and distances according to 
+    the local neighbourhood structure, to yield a barcode which is more robust 
+    to statistical outliers. The user can toggle DTM-based reweighting (or 
+    more general reweightings) by setting the optional parameters `weights` and
+  `weight_params`.
 
 # Experimental results \label{sec:experiments}
 
