@@ -299,20 +299,9 @@ starts, and the same threads are reused for different computations during
 the program's life span. This approach enables better amortization of the 
 cost of the short-lived threads used in [@morozov2020lock], where one thread 
 is created whenever needed and destroyed at the end of its computation task. 
-\autoref{tbl:pool} compares the running time of a solution based on our 
+Table \ref{tbl:pool} compares the running time of a solution based on our 
 thread pool with the former approach. The run-time improvements are highly 
 dataset dependent, but always measurable in the considered scenarios.
-
-: Comparison of programming languages used in the publishing tool.
-  []{label="proglangs"}
-
-| Language | Typing          | Garbage Collected | Evaluation | Created |
-|----------|:---------------:|:-----------------:|------------|---------|
-| Haskell  | static, strong  | yes               | non-strict | 1990    |
-| Lua      | dynamic, strong | yes               | strict     | 1993    |
-| C        | static, weak    | no                | strict     | 1972    |
-
-\autoref{proglangs}
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
 (see [@sec:related_work]), implemented so far only in the *GUDHI*
@@ -326,24 +315,26 @@ structures, making the implementation more cache-friendly, and directly
 iterating over data without any transformation, hence reducing the pressure 
 on the memory sub-system.
 
-::: []
-                  **giotto-ph backend**                                   
-  ------------- ----------------------- --------------- ----------------- ---------------
-                     **no thread pool**                   **thread pool** 
-  **dataset**                   $N = 8$       $N = 48$            $N = 8$        $N = 48$
-  `sphere3`                         0.4             0.4               0.4            0.38
-  `dragon`                          1.2             1.2               1.3             1.3
-  `o3_1024`                         0.4            0.18               0.4            0.17
-  `random16`                        0.9             0.4               0.9            0.24
-  `fractal`                         0.9            0.35               0.9            0.34
-  `o3_4096`                         6.9             2.7               6.9             2.6
-  `torus4`                           19            14.7              19.1            14.3
-
-  : Running times, expressed in seconds, with and without the thread pool. $N$
-  denotes the number of threads used. All information regarding the datasets 
-  presented here are described in [@sec:experiments] and summarized in 
-  [@tbl:datasets].[]{label=tbl:pool}
-:::
+\begin{table}
+\centering
+\caption{Running times, expressed in seconds, with and without the thread pool. 
+$N$ denotes the number of threads used. All information regarding the datasets 
+presented here is described in section \ref{sec:experiments} and summarized in 
+Table \ref{tbl:datasets}.}
+\label{tbl:pool}
+\begin{tabular}{l|r|r|r|r|}
+    \cline{2-5} & \multicolumn{4}{c|}{\textbf{giotto-ph backend}} \\ \cline{2-5} 
+                & \multicolumn{2}{c|}{\textbf{no thread pool}} & \multicolumn{2}{c|}{\textbf{thread pool}} \\ \hline
+    \multicolumn{1}{|l|}{{\textbf{dataset}}} & \multicolumn{1}{c|}{$N = 8$} & \multicolumn{1}{c|}{$N = 48$} & \multicolumn{1}{c|}{$N = 8$} & \multicolumn{1}{c|}{$N = 48$} \\ \hline
+    \multicolumn{1}{|l|}{\texttt{sphere3}}    & {0.4} & {0.4}  & {0.4}  & 0.38 \\ \hline
+    \multicolumn{1}{|l|}{\texttt{dragon}}     & {1.2} & {1.2}  & {1.3}  & 1.3 \\ \hline
+    \multicolumn{1}{|l|}{\texttt{o3\_1024}}   & {0.4} & {0.18} & {0.4}  & 0.17 \\ \hline
+    \multicolumn{1}{|l|}{\texttt{random16}}   & {0.9} & {0.4}  & {0.9}  & 0.24 \\ \hline
+    \multicolumn{1}{|l|}{\texttt{fractal}}    & {0.9} & {0.35} & {0.9}  & 0.34 \\ \hline
+    \multicolumn{1}{|l|}{\texttt{o3\_4096}}   & {6.9} & {2.7}  & {6.9}  & 2.6 \\ \hline
+    \multicolumn{1}{|l|}{\texttt{torus4}}     & {19}  & {14.7} & {19.1} & 14.3 \\ \hline
+\end{tabular}
+\end{table}
 
 ## Python Interface {#sec:python}
 
