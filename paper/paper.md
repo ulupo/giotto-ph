@@ -76,55 +76,30 @@ a wide variety of computational contexts, such as geometric inference
 @barannikov1994morse; @robins1999approximations; 
 @edelsbrunner2000simplification; @zomorodian2005computing] has attracted the 
 most attention due to (a) its ability to track the appearance and 
-disappearance of topological features in data throughout entire ranges of 
-parameters, (b) its succinct nature and ease of representation, as it simply 
-consists of a (typically small) collection of intervals of the real line, (c) 
-its provable robustness under perturbations of the input data 
-[@damico2003optimal; cohen-steiner2007stability], and (d) its amenability to 
-computation and algorithmic optimization, as demonstrated by the large 
-number of existing implementations – see Sec. 1 in [@bauer2021ripser] for a 
-review, and [@aggarwal2021dory; vonbromssen2021computing] for recent entries 
+disappearance of holes, voids, or higher-dimensional topological features in 
+data, throughout entire ranges of parameters, (b) its succinct nature and ease 
+of representation, as it simply consists of a (typically small) collection of 
+intervals of the real line, (c) its provable robustness under perturbations of 
+the input data [@damico2003optimal; cohen-steiner2007stability], and (d) its 
+amenability to computation and algorithmic optimization, as demonstrated by the 
+large number of existing implementations – see Sec. 1 in [@bauer2021ripser] for 
+a review, and [@aggarwal2021dory; vonbromssen2021computing] for recent entries 
 not mentioned there.
 
-Despite these successes, the computation of barcodes remains a challenge 
-when dealing with large datasets and/or with high-dimensional topological 
-features. We now explain why this is the case. The input to any barcode 
-computation is a growing, one-parameter family of combinatorial objects, 
-called a *filtration* or a *filtered complex*. Filtrations consist of 
-*cells* with assigned integer *dimensions* and values of the 
-filtration-defining parameter, as well as *boundary* (resp. *co-boundary*) 
-relations (mappings) between $k$-dimensional cells and ($k-1$)-dimensional 
-[resp. ($k+1$)-dimensional] ones (we refer the reader to any of the 
-aforementioned surveys of PH for rigorous definitions). Arguably, the most
-common examples of filtrations in applications concern *simplicial* 
-complexes, in which case the cells are referred to as *simplices*, and 
-$k$-dimensional simplices consist of sets of $k + 1$ points from a common 
-vertex set $V$ – for instance, a $0$-simplex $\{v\}$ is one of the vertices 
-$v \in V$, while a $1$-simplex $\{v, w\} \subseteq V$ can be thought of as 
-an edge connecting vertices $v$ and $w$. These are the filtrations of 
-interest in the present paper. In particular, we focus on the 
-*Vietoris–Rips* (VR) (resp. *flag*) filtration of a finite metric space 
-(resp. undirected graph with vertex and edge weights), in which simplices 
-are arbitrary subsets of the available points (resp. vertices) and their 
-filtration values are set to be their diameters (resp. the maximum weights 
-of all vertices and edges they contain, with absent edges being given 
-infinite filtration value).
+Despite these successes, the computation of barcodes remains a challenge when
+dealing with large datasets and/or with high-dimensional topological features. 
+Indeed, the input to any barcode computation is a growing, one-parameter family 
+of combinatorial objects, called a *filtration* or a *filtered complex*, and 
+several filtrations of interest in applications quickly become very large as 
+their defining parameter increases. This leads to a staggering number of 
+elementary row or column operations required to distil the desired barcode via 
+standard matrix reduction algorithms.
 
-Several simplicial filtrations of interest in applications, and the VR
-filtration chiefly among these, quickly become very large as their defining 
-parameter increases (and hence more and more simplices are included in the 
-growing complex). At the heart of all algorithms for computing PH barcodes 
-lies the reduction of *boundary* or *co-boundary matrices* indexed by the 
-full set of simplices in the filtration; the available reduction algorithms 
-have asymptotic space and time complexities which are polynomial in the total 
-number $N$ of simplices. In the case of the VR filtration of an input metric 
-space $\mathcal{M}$, if one is interested in computing the barcode up to and 
-including homology dimension $D$, then $N = \sum_{k=0}^{D + 1} \binom{|M|}{k}$. 
-For sizeable datasets, this combinatorial explosion leads to a staggering number 
-of elementary row or column operations (as well as memory) required to distil 
-the desired barcode. PH computation for many other simplicial filtrations 
-constructed from point clouds, finite metric spaces, or graphs are also 
-ultimately limited by similar considerations.
+While PH computation for many types of simplicial filtrations constructed from 
+point clouds, finite metric spaces, or graphs are limited by similar 
+considerations, in this work we focus on *Vietoris–Rips* (VR) filtrations of 
+finite metric spaces, as well as on *flag* filtrations of undirected graphs 
+endowed with vertex and edge weights.
 
 # Related work \label{sec:related_work}
 
