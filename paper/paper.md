@@ -520,19 +520,6 @@ ones, and thus can lead to faster computations than highly filled sparse
 ones. We are working on a heuristic to automatically select the best data
 format.
 
-# Conclusion and future work
-
-We integrated multiple, existing and novel, algorithmic ideas to obtain a 
-state-of-the-art implementation of the computation of persistent homology for 
-Vietoris–Rips filtrations. This implementation enables the use of parallel CPU 
-resources to speed up the computation and outperforms even state-of-the-art GPU 
-implementations.
-
-We plan to extend *giotto-ph* by supporting a wider range of filtrations in a 
-modular way. We also plan to add features (e.g., simplex pairs and essential 
-simplices) needed for back-propagation in a deep learning context, and seamless 
-integration with frameworks such as [*PyTorch*](https://pytorch.org/).
-
 # Acknowledgements
 
 We thank Anibal Medina-Mardones and Kathryn Hess Bellwald for numerous fruitful 
