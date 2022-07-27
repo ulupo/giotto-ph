@@ -306,44 +306,23 @@ presented here is described in Section \ref{sec:experiments} and summarized in
 
 Our Python interface is based on *Ripser.py* [@ctralie2018ripser]. While it 
 lacks some of *Ripser.py*'s features, such as the support for "greedy 
-permutations" and for retrieving cocycles, it introduces the following 
-notable improvements:
+permutations", it introduces the following improvements:
 
-  - Support for Edge Collapser. EC is disabled by default because it is 
-    expected and empirically confirmed that, unless the data is large and/or 
-    the maximum homology dimension to compute is high, the initial run-time 
-    overhead due to EC is often not compensated for by the resulting 
-    speed-up in the downstream reduction steps (see the end of 
-    \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}). 
-  - However, users can easily enable it by means of the `collapse_edges` 
-    optional argument. See also "Support for enclosing radius", below.
+  - Support for Edge Collapser. EC is disabled by default, but users can easily 
+    enable it by means of the `collapse_edges` optional argument.
 
   - Support for enclosing radius. The *(minimum) enclosing radius* of a 
     finite metric space is the radius of the smallest enclosing ball of that 
-    space. Its computation, starting from a distance matrix, is trivial to 
-    implement and takes negligible run-time on modern CPUs. Above this 
-    filtration value, the Vietoris–Rips complex becomes a cone, and hence 
-    all homology groups are trivial. Hence, simplices with higher filtration 
-    values than the enclosing radius can be safely omitted from the 
-    enumeration and matrix reduction steps, without changing the final 
-    barcode. When the enclosing radius is considerably smaller than the 
-    maximum distance in the data, this can lead to dramatic improvements in 
-    run-time and memory usage, as observed in 
-    [@henselmanpetrusek2020matroids]. (For instance, the barcode 
-    computation for the `random16` dataset (see \autoref{tbl:datasets}) up 
-    to dimension $7$ would not be completed after two hours without the 
-    enclosing radius optimization; with it, the run-time drops to seconds. 
-    Not all datasets can be expected to witness equally impressive 
-    improvements, but the cost of computing the enclosing radius is trivial 
-    compared to the computation of PH.)  Unless the user specifies a 
-    threshold, both *Eirene* [@henselmanghristl6] and *Ripser* make use of 
-    the enclosing radius optimization, and the same is true in *giotto-ph*, 
-    where the enclosing radius computation is implemented in Python using 
-    highly optimized *NumPy* functions. An element of novelty in our 
-    interface is that, when both the enclosing radius is computed and EC is 
-    enabled, the input distance matrix/weighted graph is thresholded 
-    *before* being passed to the EC backend. This can lead to substantial 
-    run-time improvements for the EC step.
+    space. Simplices with higher filtration values than the enclosing radius 
+    can be safely omitted without changing the final barcode. When the 
+    enclosing radius is considerably smaller than the maximum distance in the 
+    data, doing so can lead to dramatic improvements in run-time and memory 
+    usage [@henselmanghristl6, @henselmanpetrusek2020matroids]. Unless the user 
+    specifies a threshold, *giotto-ph* makes use of the enclosing radius 
+    optimization. An element of novelty in our interface is that, when both the 
+    enclosing radius is computed and EC is enabled, the input distance 
+    matrix/weighted graph is thresholded *before* being passed to the EC 
+    backend. This can lead to substantial run-time improvements for the EC step.
 
   - Weighted VR filtrations. While standard stability results for VR barcodes 
     [@cohen-steiner2007stability; @chazal2009proximity] guarantee robustness 
@@ -357,15 +336,6 @@ notable improvements:
     structure. The user can toggle DTM-based reweighting (or more general 
     reweightings) by appropriately setting the optional parameters `weights` 
     and `weight_params`.
-
-  - [*pybind11*](https://github.com/pybind/pybind11) bindings. We added 
-    support for and used *pybind11* instead of [*Cython*](https://cython.org/) 
-    for creating Python bindings. In our experience, it is easier to use without 
-    compromising performance. Furthermore, it is already used for the bindings 
-    in the *giotto-tda* library [@tauzin2021giottotda], our sibling project. 
-    The presence of Python bindings as well as the portability on different 
-    operating systems, namely Linux, Mac OS X, and Windows, have been two of 
-    our core objectives to facilitate the adoption of our library.
 
 # Experimental results \label{sec:experiments}
 
