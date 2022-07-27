@@ -299,9 +299,9 @@ starts, and the same threads are reused for different computations during
 the program's life span. This approach enables better amortization of the 
 cost of the short-lived threads used in [@morozov2020lock], where one thread 
 is created whenever needed and destroyed at the end of its computation task. 
-Table \autoref{tbl:pool} compares the running time of a solution based on our 
-thread pool with the former approach. The run-time improvements are highly 
-dataset dependent, but always measurable in the considered scenarios.
+\autoref{tbl:pool} compares the running time of a solution based on our thread
+pool with the former approach. The run-time improvements are highly dataset 
+dependent, but always measurable in the scenarios considered.
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
 (see [@sec:related_work]), implemented so far only in the *GUDHI*
@@ -319,20 +319,19 @@ on the memory sub-system.
 \centering
 \caption{Running times, expressed in seconds, with and without the thread pool. 
 $N$ denotes the number of threads used. All information regarding the datasets 
-presented here is described in section \ref{sec:experiments} and summarized in 
+presented here is described in Section \ref{sec:experiments} and summarized in 
 Table \ref{tbl:datasets}.}
 \label{tbl:pool}
-\begin{tabular}{l|r|r|r|r|}
-    \cline{2-5} & \multicolumn{4}{c|}{\textbf{giotto-ph backend}} \\ \cline{2-5} 
-                & \multicolumn{2}{c|}{\textbf{no thread pool}} & \multicolumn{2}{c|}{\textbf{thread pool}} \\ \hline
-    \multicolumn{1}{|l|}{{\textbf{dataset}}} & \multicolumn{1}{c|}{$N = 8$} & \multicolumn{1}{c|}{$N = 48$} & \multicolumn{1}{c|}{$N = 8$} & \multicolumn{1}{c|}{$N = 48$} \\ \hline
-    \multicolumn{1}{|l|}{\texttt{sphere3}}    & {0.4} & {0.4}  & {0.4}  & 0.38 \\ \hline
-    \multicolumn{1}{|l|}{\texttt{dragon}}     & {1.2} & {1.2}  & {1.3}  & 1.3 \\ \hline
-    \multicolumn{1}{|l|}{\texttt{o3\_1024}}   & {0.4} & {0.18} & {0.4}  & 0.17 \\ \hline
-    \multicolumn{1}{|l|}{\texttt{random16}}   & {0.9} & {0.4}  & {0.9}  & 0.24 \\ \hline
-    \multicolumn{1}{|l|}{\texttt{fractal}}    & {0.9} & {0.35} & {0.9}  & 0.34 \\ \hline
-    \multicolumn{1}{|l|}{\texttt{o3\_4096}}   & {6.9} & {2.7}  & {6.9}  & 2.6 \\ \hline
-    \multicolumn{1}{|l|}{\texttt{torus4}}     & {19}  & {14.7} & {19.1} & 14.3 \\ \hline
+\begin{tabular}{lrrrr}
+    \cline{2-5} & \multicolumn{4}{c}{\textbf{\textit{giotto-ph} backend}} \\ \cline{2-5} & \multicolumn{2}{c}{\textbf{no thread pool}} & \multicolumn{2}{c}{\textbf{thread pool}} \\ \hline
+    \textbf{dataset} & \multicolumn{1}{c}{$\bm{N = 8}$} & $\bm{N = 48}$ & $\bm{N = 8}$ & $\bm{N = 48}$ \\ \hline
+    \texttt{sphere3}    & {0.4} & {0.4}  & {0.4}  & 0.38 \\ \hline
+    \texttt{dragon}     & {1.2} & {1.2}  & {1.3}  & 1.3  \\ \hline
+    \texttt{o3\_1024}   & {0.4} & {0.18} & {0.4}  & 0.17 \\ \hline
+    \texttt{random16}   & {0.9} & {0.4}  & {0.9}  & 0.24 \\ \hline
+    \texttt{fractal}    & {0.9} & {0.35} & {0.9}  & 0.34 \\ \hline
+    \texttt{o3\_4096}   & {6.9} & {2.7}  & {6.9}  & 2.6  \\ \hline
+    \texttt{torus4}     & {19}  & {14.7} & {19.1} & 14.3 \\ \hline
 \end{tabular}
 \end{table}
 
