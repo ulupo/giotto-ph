@@ -324,14 +324,14 @@ Table \ref{tbl:datasets}.}
 \label{tbl:pool}
 \begin{tabular}{lrrrr}
     \cline{2-5} & \multicolumn{4}{c}{\textbf{\textit{giotto-ph} backend}} \\ \cline{2-5} & \multicolumn{2}{c}{\textbf{no thread pool}} & \multicolumn{2}{c}{\textbf{thread pool}} \\ \hline
-    \textbf{dataset} & \multicolumn{1}{c}{$\bm{N = 8}$} & $\bm{N = 48}$ & $\bm{N = 8}$ & $\bm{N = 48}$ \\ \hline
-    \texttt{sphere3}    & {0.4} & {0.4}  & {0.4}  & 0.38 \\ \hline
-    \texttt{dragon}     & {1.2} & {1.2}  & {1.3}  & 1.3  \\ \hline
-    \texttt{o3\_1024}   & {0.4} & {0.18} & {0.4}  & 0.17 \\ \hline
-    \texttt{random16}   & {0.9} & {0.4}  & {0.9}  & 0.24 \\ \hline
-    \texttt{fractal}    & {0.9} & {0.35} & {0.9}  & 0.34 \\ \hline
-    \texttt{o3\_4096}   & {6.9} & {2.7}  & {6.9}  & 2.6  \\ \hline
-    \texttt{torus4}     & {19}  & {14.7} & {19.1} & 14.3 \\ \hline
+    \textbf{dataset}    & $N = 8$ & $N = 48$ & $N = 8$ & $N = 48$ \\ \hline
+    \texttt{sphere3}    & {0.4}   & {0.4}    & {0.4}   & 0.38     \\ \hline
+    \texttt{dragon}     & {1.2}   & {1.2}    & {1.3}   & 1.3      \\ \hline
+    \texttt{o3\_1024}   & {0.4}   & {0.18}   & {0.4}   & 0.17     \\ \hline
+    \texttt{random16}   & {0.9}   & {0.4}    & {0.9}   & 0.24     \\ \hline
+    \texttt{fractal}    & {0.9}   & {0.35}   & {0.9}   & 0.34     \\ \hline
+    \texttt{o3\_4096}   & {6.9}   & {2.7}    & {6.9}   & 2.6      \\ \hline
+    \texttt{torus4}     & {19}    & {14.7}   & {19.1}  & 14.3     \\ \hline
 \end{tabular}
 \end{table}
 
