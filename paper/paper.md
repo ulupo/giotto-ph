@@ -11,11 +11,10 @@ tags:
   - simplicial collapses
 authors:
   - name: Julián Burella Pérez
-    orcid: XXX
     equal-contrib: true
     affiliation: 1
   - name: Sydney Hauke
-    orcid: XXX
+    orcid: 0000-0003-3810-5652
     equal-contrib: true
     affiliation: 1
   - name: Umberto Lupo
@@ -24,10 +23,10 @@ authors:
     corresponding: true
     affiliation: "2, 3"
   - name: Matteo Caorsi
-    orcid: XXX
+    orcid: 0000-0001-9416-9090
     affiliation: 4
   - name: Alberto Dassatti
-    orcid: XXX
+    orcid: 0000-0002-5342-3723
     affiliation: 1
 affiliations:
   - name: HEIG-VD, HES-SO, Route de Cheseaux 1, Yverdon-les-Bains, Switzerland
