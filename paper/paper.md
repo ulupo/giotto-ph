@@ -249,28 +249,10 @@ pairs approach, in its parallel form, to harvest its benefits in shortening
 run-times: a decreased number of columns to reduce [@bauer2021ripser] and an 
 additional early stop condition when enumerating cofacets.
 
-The main data structure of the algorithm described in [@morozov2020towards] 
-is a lock-free hash table. A lock-free hash table is a concurrent hash map 
-where concurrent operations do not make use of synchronization mechanisms 
-such as mutexes. Instead, a lock-free hash table relies on atomic operations 
-for manipulating its content; in particular, insertion is carried out by a 
-mechanism called compare-and-swap (CAS). After benchmarking a few 
-performance-oriented alternatives offering portability for most available 
-compilers for Linux, Mac OS X, and Windows systems, we created a custom hash 
-map adapted to the needs of the core matrix reduction algorithm, using the 
-"Leapfrog" implementation in the open-source 
-[*Junction*](https://github.com/preshing/junction) library.
-
 As previously mentioned, we also adopted a different threading strategy: a 
-*thread pool* (with optional CPU pinning option). A thread pool is a design 
-pattern in which a "pool" of threads is created up front when the program 
-starts, and the same threads are reused for different computations during 
-the program's life span. This approach enables better amortization of the 
+*thread pool* (with optional CPU pinning option). This approach enables better amortization of the
 cost of the short-lived threads used in [@morozov2020lock], where one thread 
 is created whenever needed and destroyed at the end of its computation task. 
-\autoref{tbl:pool} compares the running time of a solution based on our thread
-pool with the former approach. The run-time improvements are highly dataset 
-dependent, but always measurable in the scenarios considered.
 
 The final component in our C++ backend is a rewriting of the EC algorithm 
 (see \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}), 
