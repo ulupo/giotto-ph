@@ -463,32 +463,6 @@ $x$-axis represent the number of threads used and the $y$-axis  the time (in
 seconds) to complete the PH computation.
 \label{fig:comparison_gph_rpp}](giotto-ph_rpp.svg){width=100%}
 
-## Higher homology dimensions
-
-Table ??? compares *Ripser v1.2* and *giotto-ph* when
-increasing the homology dimension parameter. We included the measurements
-using EC to show the potential benefits. It is important to note that
-timings reported using EC do not include EC processing time. The first 
-dimension reported in Table ??? is the one in the setup of 
-\autoref{tbl:datasets}.
-
-`sphere3` and `random16` are the only datasets where the Maximal Index (**MI**)
-(i.e. the maximum number of retrievable entries) is not attained. `sphere3`
-is a highly regular dataset and computing higher homology dimensions will
-not yield interesting results. `random16` produces no barcodes at dimension
-$20$. We arbitrarily decided to stop at dimension $10$ and report the data.
-
-\autoref{tbl:datasets} shows that, in general, pre-processing with EC
-leads to a reduction in later run-times. The only exception is the `sphere3`
-dataset, where EC is slightly detrimental. The reason for this is
-implementational in nature as we now explain. The EC step takes as input the
-dataset's distance matrix in dense format, and outputs a sparse matrix. In
-the case of `sphere3`, EC removes very few edges, producing a highly filled
-sparse matrix. Dense representations have better cache behaviour than sparse
-ones, and thus can lead to faster computations than highly filled sparse
-ones. We are working on a heuristic to automatically select the best data
-format.
-
 # Acknowledgements
 
 We thank Anibal Medina-Mardones and Kathryn Hess Bellwald for numerous fruitful 
