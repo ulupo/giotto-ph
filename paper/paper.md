@@ -11,6 +11,7 @@ tags:
   - simplicial collapses
 authors:
   - name: Julián Burella Pérez
+    orcid: 0000-0003-0631-1179
     equal-contrib: true
     affiliation: 1
   - name: Sydney Hauke
