@@ -132,12 +132,7 @@ version of *Ripser* was put in the public domain in June 2020
 generic implementation of the ideas in [@morozov2020towards], not tied to 
 Vietoris–Rips filtrations and instead designed to make lock-free reduction 
 possible on any (co)boundary matrix, has recently been published as the 
-*Oineus* library [@nigmetov2020oineus]. Although optimizations such as clearing 
-and implicit matrix reduction appear to have been implemented there, the code 
-and performance are not optimized for Vietoris–Rips filtrations, and in 
-particular no implementation of the emergent *or* apparent pair optimization is 
-present there at this time. (At the time of writing, this library is in version 
-1.0. We were not aware of its existence during the development of our code.)
+*Oineus* library [@nigmetov2020oineus].
 
 *Ripser++* [@zhang2020gpuaccelerated] implements the idea of finding apparent 
 pairs in parallel on a GPU to accelerate the computation of VR barcodes. 
