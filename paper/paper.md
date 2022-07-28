@@ -229,14 +229,10 @@ The Python interface is based on *Ripser.py* [@ctralie2018ripser] (see
 figure also shows the inheritance of *giotto-ph*'s C++ backend from pre-dating 
 implementations. \label{fig:lib}](architecture_bpj.svg){width=100%}
 
-*giotto-ph* is a library dedicated to the efficient computation of PH of VR 
-filtrations (see \hyperref[sec:need]{``Statement of need"\ref*{sec:need}}). It 
-inherits and extends ideas and code from many sources; \autoref{fig:lib} gives 
-a visual representation of the most important ones among them. Our aim with 
-*giotto-ph* is to provide an alternative to the excellent *Ripser.py* library, 
-retaining several of the latter's advantages, namely portability and ease of 
-use, while replacing the C++ backend with a new parallel and higher-performance 
-version. 
+Our aim with *giotto-ph* is to provide an alternative to the excellent *Ripser.py* library,
+retaining several of the latter's advantages, namely portability and ease of
+use, while replacing the C++ backend with a new parallel and higher-performance
+version.
 
 ## C++ backend \label{sec:Cpp_backend}
 
