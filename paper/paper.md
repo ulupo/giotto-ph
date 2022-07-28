@@ -171,6 +171,10 @@ dimensions, and/or when one is dealing with large datasets. An implementation of
 EC has already been integrated into the *GUDHI* library 
 [@gudhi:urm; @gudhi:Collapse].
 
+Gudhi improved their first version of EC implementation with new techniques.
+They compared [@glisse2022edge] their new version againt our. The achieved
+outstading speed-ups, we hope at some point integrate their latest version.
+
 # Our contribution
 
 In this context, we present 
