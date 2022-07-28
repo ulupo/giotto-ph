@@ -278,32 +278,7 @@ implemented so far only in the *GUDHI* library [@gudhi:Collapse]. Our
 implementation focuses on performance and removes the dependencies on the 
 *Boost* [@BoostLibrary] and *Eigen* [@eigenweb] libraries. It also supports 
 weighted graphs with arbitrary (possibly non-positive) edge weights as well as 
-arbitrary node weights. Improvements were achieved mainly by reworking data 
-structures, making the implementation more cache-friendly, and directly 
-iterating over data without any transformation, hence reducing the pressure on 
-the memory sub-system.
-
-\begin{table}
-\centering
-\caption{Running times, expressed in seconds, with and without the thread pool. 
-$N$ denotes the number of threads used. All information regarding the datasets 
-presented here is described in Section \ref{sec:experiments} and summarized in 
-\autoref{tbl:datasets}.}
-\label{tbl:pool}
-\begin{tabular}{lrrrr}
-    \hline
-     & \multicolumn{2}{c}{\textbf{no thread pool}} & \multicolumn{2}{c}{\textbf{thread pool}} \\ \hline
-    \textbf{dataset}    & $N = 8$ & $N = 48$ & $N = 8$ & $N = 48$ \\ \hline
-    \texttt{sphere3}    & {0.4}   & {0.4}    & {0.4}   & 0.38     \\ \hline
-    \texttt{dragon}     & {1.2}   & {1.2}    & {1.3}   & 1.3      \\ \hline
-    \texttt{o3\_1024}   & {0.4}   & {0.18}   & {0.4}   & 0.17     \\ \hline
-    \texttt{random16}   & {0.9}   & {0.4}    & {0.9}   & 0.24     \\ \hline
-    \texttt{fractal}    & {0.9}   & {0.35}   & {0.9}   & 0.34     \\ \hline
-    \texttt{o3\_4096}   & {6.9}   & {2.7}    & {6.9}   & 2.6      \\ \hline
-    \texttt{torus4}     & {19}    & {14.7}   & {19.1}  & 14.3     \\
-    \hline
-\end{tabular}
-\end{table}
+arbitrary node weights.
 
 ## Python interface \label{sec:python}
 
