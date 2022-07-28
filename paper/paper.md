@@ -113,11 +113,9 @@ it makes use of other performance-oriented ideas, such as the implicit
 representation of the (co)boundary and reduced (co)boundary matrices, and 
 the *emergent/apparent pairs* optimizations (we refer to [@bauer2021ripser] 
 for definitions and details). At the time of writing, the latest version of 
-*Ripser* is *v1.2* (release date: 25 February 2021).  In that version, to 
-the emergent pairs optimization in use until that point was added an 
-optimization based on apparent pairs.
+*Ripser* is *v1.2.1* (release date: 22 May 2021).
 
-Although *Ripser v1.2* is arguably the fastest existing code for computing VR
+Although *Ripser v1.2.1* is arguably the fastest existing code for computing VR
 barcodes in a sequential (i.e., single CPU core) setting, it has no parallel 
 capabilities. Overcoming this limitation is possible as two recent lines of 
 work [@morozov2020towards; @zhang2020gpuaccelerated] demonstrate. Based on a 
