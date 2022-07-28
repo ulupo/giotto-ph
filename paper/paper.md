@@ -390,22 +390,6 @@ only up to dimension $1$ and the cost of setting up the parallel element of
 the library is non-zero.
 \label{fig:gph_vs_ripser_1.2}](giotto_vs_ripser1.2.svg){width=80%}
 
-\autoref{fig:scaling} shows the scaling of *giotto-ph* when increasing 
-the number of worker threads. Scaling is different for each dataset due to 
-the variable number of apparent and emergent pairs as well as the dimension 
-parameter used. Observe that the larger the number of points in the dataset, 
-the better the scaling. Similar effects are visible for datasets in which 
-when the maximal homology dimension to compute is higher.
-
-As seen above for run-times versus *Ripser v1.2*, for scaling, too, the least 
-favourable results are obtained on datasets such as `sphere3` and `sphere3`, 
-in which both the size and maximum homology dimension to compute are small.
-
-![Scaling of *giotto-ph* when increasing the number of threads. This figure 
-is similar to \autoref{fig:gph_vs_ripser_1.2} because in a single thread 
-configuration *giotto-ph* performs very similarly to *Ripser v1.2*.
-\label{fig:scaling}](giotto_speedup.svg){width=80%}
-
 According to our measurements reported in Figure \autoref{fig:moro}, our 
 implementation outperforms Morozov and Nigmetov's proof-of-concept 
 implementation [@morozov2020lock] in most cases, and most noticeably when 
