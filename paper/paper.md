@@ -44,21 +44,20 @@ bibliography: paper.bib
 
 # Summary
 
-We introduce *giotto-ph*, a high-performance, open-source software package 
-for the computation of Vietoris--Rips barcodes. *giotto-ph* is based on 
-Morozov and Nigmetov's lockfree (multicore) implementation of Ulrich Bauer's 
-*Ripser* package. It also contains a re-working of the *GUDHI* library's 
-implementation of Boissonnat and Pritam's *Edge Collapser*, which can be 
-used as a pre-processing step to dramatically reduce overall run-times in 
-certain scenarios. Our contribution is twofold: on the one hand, we 
-integrate existing state-of-the-art ideas coherently in a single library and 
-provide Python bindings to the C++ code. On the other hand, we increase 
-parallelization opportunities and improve overall performance by adopting 
-more efficient data structures. Our persistent homology backend establishes 
-a new state of the art, surpassing even GPU-accelerated implementations such 
-as *Ripser++* when using as few as 5–10 CPU cores. Furthermore, our 
-implementation of *Edge Collapser* has fewer software dependencies and 
-improved run-times relative to *GUDHI*'s original implementation.
+We introduce *giotto-ph*, a high-performance package for the computation of 
+Vietoris–Rips (VR) persistent homology barcodes. *giotto-ph*'s C++ backend 
+builds on a recent [@morozov2020towards; @morozov2020lock] lockfree (multicore) 
+implementation of *Ripser* [@bauer2021ripser], while borrowing ideas from 
+*Ripser++* [@zhang2020gpuaccelerated] to increase parallelization opportunities. 
+In addition, we introduce novel algorithmic speedups and implement the retrieval 
+of flag persistence generators, thus paving the way for high-performance 
+*differentiable* VR barcode computations. Furthermore, we improve portability, 
+provide convenient Python bindings inspired by *Ripser.py* [@ctralie2018ripser], 
+integrate a reimplementation of the *GUDHI* library's *Edge Collapser* 
+[@boissonnat2020edge; gudhi:Collapse] as a pre-processing step, and provide 
+support for weighted VR filtrations [@anai2020dtmbased]. Our persistent homology 
+backend establishes a new state of the art, surpassing even GPU-accelerated 
+implementations such as *Ripser++* when using as few as 5–10 CPU cores.
 
 # Statement of need \label{sec:need}
 
