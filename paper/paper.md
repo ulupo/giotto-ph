@@ -77,23 +77,19 @@ a wide variety of computational contexts, such as geometric inference
 @edelsbrunner2000simplification; @zomorodian2005computing] has attracted the 
 most attention due to (a) its ability to track the appearance and 
 disappearance of holes, voids, or higher-dimensional topological features in 
-data, throughout entire ranges of parameters, (b) its succinct nature and ease 
-of representation, as it simply consists of a (typically small) collection of 
-intervals of the real line, (c) its provable robustness under perturbations of 
-the input data [@damico2003optimal; @cohen-steiner2007stability], and (d) its 
-amenability to computation and algorithmic optimization, as demonstrated by the 
-large number of existing implementations – see Sec. 1 in [@bauer2021ripser] for 
-a review, and [@aggarwal2021dory; @vonbromssen2021computing] for recent entries 
-not mentioned there.
+data, (b) its succinct nature and ease of representation, (c) its robustness 
+under perturbations [@damico2003optimal; @cohen-steiner2007stability], and (d) 
+its amenability to computation and algorithmic optimization – see Sec. 1 in 
+[@bauer2021ripser] for a review, and the recent implementations in
+[@aggarwal2021dory; @vonbromssen2021computing].
 
 Despite these successes, the computation of barcodes remains a challenge when
 dealing with large datasets and/or with high-dimensional topological features. 
 Indeed, the input to any barcode computation is a growing, one-parameter family 
-of combinatorial objects, called a *filtration* or a *filtered complex*, and 
-several filtrations of interest in applications quickly become very large as 
-their defining parameter increases. This leads to a staggering number of 
-elementary row or column operations required to distil the desired barcode via 
-standard matrix reduction algorithms.
+of combinatorial objects, called a *filtration*, and several filtrations of 
+interest in applications quickly become very large as their defining parameter 
+increases. This leads to a staggering number of operations required to distil 
+the desired barcode via established matrix reduction algorithms.
 
 While PH computation for many types of simplicial filtrations constructed from 
 point clouds, finite metric spaces, or graphs are limited by similar 
