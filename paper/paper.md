@@ -247,15 +247,7 @@ permutations", it introduces the following improvements:
   - Support for enclosing radius. The *(minimum) enclosing radius* of a 
     finite metric space is the radius of the smallest enclosing ball of that 
     space. Simplices with higher filtration values than the enclosing radius 
-    can be safely omitted without changing the final barcode. When the 
-    enclosing radius is considerably smaller than the maximum distance in the 
-    data, doing so can lead to dramatic improvements in run-time and memory 
-    usage [@henselmanghristl6, @henselmanpetrusek2020matroids]. Unless the user 
-    specifies a threshold, *giotto-ph* makes use of the enclosing radius 
-    optimization. An element of novelty in our interface is that, when both the 
-    enclosing radius is computed and EC is enabled, the input distance 
-    matrix/weighted graph is thresholded *before* being passed to the EC 
-    backend. This can lead to substantial run-time improvements for the EC step.
+    can be safely omitted without changing the final barcode.
 
   - Weighted VR filtrations. Distance-to-measure (DTM) based filtrations 
     [@anai2020dtmbased] address re-weight vertices and distances according to 
