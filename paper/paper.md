@@ -229,11 +229,6 @@ pairs approach, in its parallel form, to harvest its benefits in shortening
 run-times: a decreased number of columns to reduce [@bauer2021ripser] and an 
 additional early stop condition when enumerating cofacets.
 
-As previously mentioned, we also adopted a different threading strategy: a 
-*thread pool* (with optional CPU pinning option). This approach enables better amortization of the
-cost of the short-lived threads used in [@morozov2020lock], where one thread 
-is created whenever needed and destroyed at the end of its computation task. 
-
 The final component in our C++ backend is a rewriting of the EC algorithm 
 (see \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}), 
 implemented so far only in the *GUDHI* library [@gudhi:Collapse]. Our 
@@ -335,8 +330,7 @@ multiple threads is `sphere3`. The version in [@morozov2020lock] performs
 better and better on `sphere3` when increasing the number of parallel 
 resources, while ours (see \autoref{fig:scaling}) does not. The main culprit is
 that, while in [@morozov2020lock] parallel resources are allocated only when 
-needed in the computation, our thread pool (see 
-\hyperref[sec:Cpp_backend]{``C++ backend"\ref*{sec:Cpp_backend}}) will allocate
+needed in the computation, our thread pool will allocate
 all the parallel resources indicated by the user ahead of time. Our approach is 
 most beneficial when the allocated resources can be reused during the 
 computation, and this is true e.g. when computing homology dimensions in degree
