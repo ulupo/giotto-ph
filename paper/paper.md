@@ -229,11 +229,9 @@ pairs approach, in its parallel form, to harvest its benefits in shortening
 run-times: a decreased number of columns to reduce [@bauer2021ripser] and an 
 additional early stop condition when enumerating cofacets.
 
-The final component in our C++ backend is a rewriting of the EC algorithm 
-(see \hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}}), 
+The final component in our C++ backend is a rewriting of the EC algorithm,
 implemented so far only in the *GUDHI* library [@gudhi:Collapse]. Our 
-implementation focuses on performance and removes the dependencies on the 
-*Boost* [@BoostLibrary] and *Eigen* [@eigenweb] libraries. It also supports 
+implementation focuses on performance and adds support to
 weighted graphs with arbitrary (possibly non-positive) edge weights as well as 
 arbitrary node weights.
 
