@@ -130,14 +130,8 @@ possible on any (co)boundary matrix, has recently been published as the
 *Oineus* library [@nigmetov2020oineus].
 
 *Ripser++* [@zhang2020gpuaccelerated] implements the idea of finding apparent 
-pairs in parallel on a GPU to accelerate the computation of VR barcodes. 
-Despite this, *Ripser++* is not fully parallel. For each dimension to process, 
-it divides the computation into three sub-tasks: "*filtration construction and 
-clearing*", "*finding apparent pairs*" and "*sub-matrix reduction*". The last 
-of these steps is not parallel, and it is executed on the CPU. Hence, there 
-is room for extending parallelism to the third sub-task above, which we try to 
-harvest in this work by integrating the aforementioned ideas from 
-[@morozov2020towards].
+pairs in parallel on a GPU to accelerate the computation of VR barcodes. But,
+the reduction matrix step is executed sequentiall on the CPU.
 
 All implementations presented in this subsection so far (barring 
 [@nigmetov2020oineus], which also provides some Python bindings) are written in 
