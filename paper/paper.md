@@ -142,20 +142,20 @@ retrieval of cocycles, as well as a convenient Python interface.
 Meanwhile, in 2020, Boissonnat and Pritam presented a new algorithm they called 
 *Edge Collapser* (EC) [@boissonnat2020edge]. Independently of the code used to 
 compute barcodes, EC can be used as a pre-processing step on any flag filtration 
-to remove "redundant" edges – and modify the filtration values of some others 
-– while ensuring that the flag filtration obtained from the thus "sparsified" 
-weighted graph has the same barcode as the original filtration. Although it 
+to remove "redundant" edges – and modify the filtration values of some others
+– while ensuring that the flag filtration obtained from the thus "sparsified"
+weighted graph has the same barcode as the original filtration. Although it
 introduces an initial overhead, pre-processing by EC can dramatically improve 
-the end-to-end run-time for barcode computation by greatly reducing the 
-complexity of the downstream reduction steps. As reported by those authors, this 
-is especially true when one wishes to compute barcodes in high homology  
+the end-to-end run-time for barcode computation by greatly reducing the
+complexity of the downstream reduction steps. As reported by those authors, this
+is especially true when one wishes to compute barcodes in high homology
 dimensions, and/or when one is dealing with large datasets. An implementation of 
 EC has already been integrated into the *GUDHI* library 
 [@gudhi:urm; @gudhi:Collapse].
 
 Gudhi improved their first version of EC implementation with new techniques.
-They compared [@glisse2022edge] their new version againt our. The achieved
-outstading speed-ups, we hope at some point integrate their latest version.
+They compared [@glisse2022edge] their new version against our implementation.
+The achieved outstading speed-ups, we hope at some point integrate their latest version.
 
 # Our contribution
 
