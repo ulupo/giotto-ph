@@ -318,7 +318,7 @@ implementation [@morozov2020lock] in most cases, and most noticeably when
 the number of parallel resources increases. The only exception when using 
 multiple threads is `sphere3`. The version in [@morozov2020lock] performs 
 better and better on `sphere3` when increasing the number of parallel 
-resources, while ours (see \autoref{fig:scaling}) does not. The main culprit is
+resources, while ours does not. The main culprit is
 that, while in [@morozov2020lock] parallel resources are allocated only when 
 needed in the computation, our thread pool will allocate
 all the parallel resources indicated by the user ahead of time. Our approach is 
