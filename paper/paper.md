@@ -61,41 +61,38 @@ implementations such as *Ripser++* when using as few as 5–10 CPU cores.
 
 # Statement of need \label{sec:need}
 
-In recent years, *persistent homology* (PH) (see e.g. [@ghrist2007barcodes; 
+*Persistent homology* (PH) (see e.g. [@ghrist2007barcodes; 
 @edelsbrunner2008persistent; @edelsbrunner2014persistent; 
 @oudot2015persistence; @chazal2016structure; @perea2018brief; 
-@carlsson2019persistent; @nanda2021computational] for surveys) has been a key 
-driving force behind the ever-increasing adoption of topological approaches in 
-a wide variety of computational contexts, such as geometric inference 
+@carlsson2019persistent; @nanda2021computational] for surveys) has led to the 
+adoption of novel topological methodologies in a wide variety of computational 
+contexts, such as geometric inference 
 [@edelsbrunner2014short; @boissonnat2018geometric], signal processing 
 [@robinson2014topological; @perea2015sliding], data visualization 
-[@tierny2018topological], and, more generally, data analysis 
-[@carlsson2009topology; @chazal2021introduction] and machine learning 
-[@hensel2021survey]. Among the main invariants described by this theory, the 
-(*persistence*) *barcode* [@frosini1990shapes; @frosini1992measuring; 
-@barannikov1994morse; @robins1999approximations; 
-@edelsbrunner2000simplification; @zomorodian2005computing] has attracted the 
-most attention due to (a) its ability to track the appearance and 
-disappearance of holes, voids, or higher-dimensional topological features in 
-data, (b) its succinct nature and ease of representation, (c) its robustness 
-under perturbations [@damico2003optimal; @cohen-steiner2007stability], and (d) 
-its amenability to computation and algorithmic optimization – see Sec. 1 in 
-[@bauer2021ripser] for a review, and the recent implementations in
-[@aggarwal2021dory; @vonbromssen2021computing].
+[@tierny2018topological], data analysis and machine learning 
+[@carlsson2009topology; @chazal2021introduction; @hensel2021survey]. Among the 
+invariants described by this theory, the (*persistence*) *barcode* 
+[@frosini1990shapes; @frosini1992measuring; @barannikov1994morse; 
+@robins1999approximations; @edelsbrunner2000simplification; 
+@zomorodian2005computing] has attracted the most attention due to (a) its 
+ability to track the appearance and disappearance of holes, voids, or 
+higher-dimensional topological features in data, (b) its succinct nature and 
+ease of representation, (c) its robustness under perturbations 
+[@damico2003optimal; @cohen-steiner2007stability], and (d) its amenability to 
+algorithmic optimization – see Sec. 1 in [@bauer2021ripser] for a review, and 
+the recent implementations in [@aggarwal2021dory; @vonbromssen2021computing].
 
 Despite these successes, the computation of barcodes remains a challenge when
 dealing with large datasets and/or with high-dimensional topological features. 
 Indeed, the input to any barcode computation is a growing, one-parameter family 
 of combinatorial objects, called a *filtration*, and several filtrations of 
-interest in applications quickly become very large as their defining parameter 
+interest in applications become very large as their defining parameter 
 increases. This leads to a staggering number of operations required to distil 
-the desired barcode via established matrix reduction algorithms.
+barcodes via established matrix reduction algorithms.
 
-While PH computation for many types of simplicial filtrations constructed from 
-point clouds, finite metric spaces, or graphs are limited by similar 
-considerations, in this work we focus on *Vietoris–Rips* (VR) filtrations of 
-finite metric spaces, as well as on *flag* filtrations of undirected graphs 
-endowed with vertex and edge weights.
+This is particularly true of *Vietoris–Rips* (VR) filtrations of finite metric 
+spaces and of *flag* filtrations of weighted undirected graphs, which are the 
+object of this work.
 
 # Related work \label{sec:related_work}
 
