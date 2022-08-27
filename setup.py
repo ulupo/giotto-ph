@@ -46,7 +46,6 @@ CLASSIFIERS = ["Intended Audience :: Science/Research",
                "Operating System :: POSIX",
                "Operating System :: Unix",
                "Operating System :: MacOS",
-               "Programming Language :: Python :: 3.6",
                "Programming Language :: Python :: 3.7",
                "Programming Language :: Python :: 3.8",
                "Programming Language :: Python :: 3.9",
@@ -54,24 +53,19 @@ CLASSIFIERS = ["Intended Audience :: Science/Research",
 KEYWORDS = "machine learning, topological data analysis, persistent " \
            "homology"
 INSTALL_REQUIRES = requirements
-EXTRAS_REQUIRE = {"tests": ["pandas",
-                            "pytest",
+EXTRAS_REQUIRE = {"tests": ["pytest",
                             "pytest-cov",
                             "pytest-azurepipelines",
                             "pytest-benchmark",
                             "jupyter_contrib_nbextensions",
                             "flake8",
                             "hypothesis"],
-                  "doc": ["openml",
-                          "sphinx",
+                  "doc": ["sphinx",
                           "nbconvert",
                           "sphinx-issues",
                           "sphinx_rtd_theme",
                           "numpydoc"],
-                  "examples": ["jupyter",
-                               "pandas",
-                               "openml",
-                               "matplotlib"]}
+                  "examples": ["jupyter"]}
 
 
 def combine_requirements(base_keys):
@@ -131,6 +125,13 @@ class CMakeBuild(build_ext):
         else:
             cmake_args += [f"-DCMAKE_BUILD_TYPE={cfg}"]
             build_args += ["--", "-j2"]
+
+        if sys.platform.startswith("darwin"):
+            # Cross-compile support for macOS - respect ARCHFLAGS if set
+            archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
+            if archs:
+                cmake_args += \
+                    ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
         env = os.environ.copy()
         env["CXXFLAGS"] = f"{env.get('CXXFLAGS', '')} -DVERSION_INFO="\
