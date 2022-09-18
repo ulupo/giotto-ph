@@ -91,63 +91,55 @@ these barcodes.
 
 # Related work \label{sec:related_work}
 
-To the best of our knowledge, at the time of writing 
+To the best of our knowledge, at the time of writing
 [*Ripser*](https://github.com/Ripser/ripser) [@bauer2021ripser] is the *de 
 facto* state of the art and reference for computing VR persistence barcodes 
-on CPUs. *Ripser* uses multiple known optimizations like *clearing* 
-[@chen2011persistent] and *cohomology* [@desilva2011dualities]. Furthermore, 
-it makes use of other performance-oriented ideas, such as the implicit 
+on the CPU. *Ripser* uses multiple known optimizations like *clearing* 
+[@chen2011persistent] and *cohomology* [@desilva2011dualities]. Furthermore, it 
+makes use of other performance-oriented ideas, such as the implicit 
 representation of the (co)boundary and reduced (co)boundary matrices, and 
 the *emergent/apparent pairs* optimizations (we refer to [@bauer2021ripser] 
 for definitions and details). At the time of writing, the latest version of 
 *Ripser* is *v1.2.1* (release date: 22 May 2021).
 
-Although *Ripser v1.2.1* is arguably the fastest existing code for computing VR
-barcodes in a sequential (i.e., single CPU core) setting, it has no parallel 
-capabilities. Overcoming this limitation is possible as two recent lines of 
-work [@morozov2020towards; @zhang2020gpuaccelerated] demonstrate. Based on a 
-"pairing uniqueness lemma" proved in [@cohen-steiner2006vines], Morozov and 
-Nigmetov [@morozov2020towards] observe that the reduction of the (co)boundary 
-matrix can, in fact, be performed out of order as long as column additions are 
-always performed left to right (relative to the filtration order). Therefore – 
-these authors suggest – any column reduction can be efficiently performed in \
-parallel provided adequate synchronisation is used. A functional proof of 
-concept of this idea as applied to a now superseded (in particular, based on 
-*Ripser v1.1* and hence not using apparent pairs, cf. \autoref{fig:lib}) 
-version of *Ripser* was put in the public domain in June 2020 
-[@morozov2020lock], but has not led to a distributable software package. A 
-generic implementation of the ideas in [@morozov2020towards], not tied to 
-Vietoris–Rips filtrations and instead designed to make lock-free reduction 
-possible on any (co)boundary matrix, has recently been published as the 
-*Oineus* library [@nigmetov2020oineus].
+*Ripser* has no parallel capabilities. Overcoming this limitation is possible
+as two recent lines of work [@morozov2020towards; @zhang2020gpuaccelerated]
+have demonstrated. Morozov and Nigmetov [@morozov2020towards] observed that the
+reduction of the (co)boundary matrix at the heart of barcode compuations can,
+in fact, be performed out of order as long as column additions are always
+performed left to right (relative to the filtration order). Therefore, any
+column reduction can be efficiently performed in parallel provided adequate
+synchronisation is used. A functional proof of concept of this idea as applied
+to *Ripser v1.1* was put in the public domain in June 2020 [@morozov2020lock],
+but has not led to a distributable software package. A generic implementation
+of the ideas in [@morozov2020towards], not tied to VR filtrations
+and instead designed to make lock-free reduction possible on any (co)boundary
+matrix, has recently been published as the *Oineus* library
+[@nigmetov2020oineus].
 
-*Ripser++* [@zhang2020gpuaccelerated] implements the idea of finding apparent 
-pairs in parallel on a GPU to accelerate the computation of VR barcodes. But,
-the reduction matrix step is executed sequentiall on the CPU.
+*Ripser++* [@zhang2020gpuaccelerated] implements the idea of finding apparent
+pairs in parallel on a GPU to accelerate the computation of VR barcodes.
+However, the aforementioned matrix reduction step is still executed
+sequentially on the CPU.
 
-All implementations presented in this subsection so far (barring 
-[@nigmetov2020oineus], which also provides some Python bindings) are written in 
-low-level languages (C++, CUDA). *Ripser.py* [@ctralie2018ripser] contains a 
+All implementations presented in this subsection so far (barring
+[@nigmetov2020oineus], which also provides some Python bindings) are written in
+low-level languages (C++, CUDA). *Ripser.py* [@ctralie2018ripser] contains a
 modified version of *Ripser* with support for non-zero birth times and for the 
 retrieval of cocycles, as well as a convenient Python interface.
 
 Meanwhile, in 2020, Boissonnat and Pritam presented a new algorithm they called 
 *Edge Collapser* (EC) [@boissonnat2020edge]. Independently of the code used to 
-compute barcodes, EC can be used as a pre-processing step on any flag filtration 
-to remove "redundant" edges – and modify the filtration values of some others
-– while ensuring that the flag filtration obtained from the thus "sparsified"
-weighted graph has the same barcode as the original filtration. Although it
-introduces an initial overhead, pre-processing by EC can dramatically improve 
-the end-to-end run-time for barcode computation by greatly reducing the
-complexity of the downstream reduction steps. As reported by those authors, this
-is especially true when one wishes to compute barcodes in high homology
-dimensions, and/or when one is dealing with large datasets. An implementation of 
-EC has already been integrated into the *GUDHI* library 
-[@gudhi:urm; @gudhi:Collapse].
-
-Gudhi improved their first version of EC implementation with new techniques.
-They compared [@glisse2022edge] their new version against our implementation.
-The achieved outstading speed-ups, we hope at some point integrate their latest version.
+compute barcodes, EC can be used as a pre-processing step on any flag
+filtration to make it sparser while preserving its barcode exactly. Although
+it introduces an initial overhead, pre-processing by EC can dramatically
+improve the end-to-end run-time for barcode computation by greatly reducing
+the complexity of the downstream matrix reduction steps (particularly in high
+homology dimensions and/or with large datasets). A first implementation
+[@gudhi:Collapse] of EC was integrated into the *GUDHI* library [@gudhi:urm]
+and we reimplemented it as part of *giotto-ph*. Note, however, that the *GUDHI*
+team have since greatly improved on their first version by using new techniques
+[@glisse2022edge].
 
 # Our contribution
 
