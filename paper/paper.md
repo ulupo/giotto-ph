@@ -3,6 +3,7 @@ title: '*giotto-ph*: A Python Library for High-Performance Computation of
 Persistent Homology of Vietoris–Rips Filtrations'
 tags:
   - Python
+  - C++
   - topological data analysis
   - persistent homology
   - machine learning
@@ -44,55 +45,49 @@ bibliography: paper.bib
 
 # Summary
 
-We introduce *giotto-ph*, a high-performance package for the computation of 
-Vietoris–Rips (VR) persistent homology barcodes. *giotto-ph*'s C++ backend 
-builds on a recent [@morozov2020towards; @morozov2020lock] lockfree (multicore) 
-implementation of *Ripser* [@bauer2021ripser], while borrowing ideas from 
-*Ripser++* [@zhang2020gpuaccelerated] to increase parallelization opportunities. 
-In addition, we introduce novel algorithmic speedups and implement the retrieval 
-of flag persistence generators, thus paving the way for high-performance 
-*differentiable* VR barcode computations. Furthermore, we improve portability, 
-provide convenient Python bindings inspired by *Ripser.py* [@ctralie2018ripser], 
-integrate a reimplementation of the *GUDHI* library's *Edge Collapser* 
-[@boissonnat2020edge; gudhi:Collapse] as a pre-processing step, and provide 
-support for weighted VR filtrations [@anai2020dtmbased]. Our persistent homology 
-backend establishes a new state of the art, surpassing even GPU-accelerated 
-implementations such as *Ripser++* when using as few as 5–10 CPU cores.
+We introduce *giotto-ph*, a high-performance C++/Python package for the
+computation of Vietoris–Rips (VR) persistent homology barcodes. *giotto-ph*'s
+backend builds on a recent [@morozov2020towards; @morozov2020lock] lockfree
+implementation of *Ripser* [@bauer2021ripser], borrows ideas from *Ripser++*
+[@zhang2020gpuaccelerated] to further increase parallelization opportunities,
+and introduces novel algorithmic speedups. In this way, it establishes a new
+state of the art, surpassing even GPU-accelerated implementations when using as
+few as 5–10 CPU cores. It also allows for the retrieval of flag persistence
+generators, thus paving the way for high-performance *differentiable* VR
+barcode computations. Furthermore, it integrates a reimplementation of the
+*GUDHI* library's *Edge Collapser* [@boissonnat2020edge; gudhi:Collapse] as a
+pre-processing step, and includes support for weighted VR filtrations
+[@anai2020dtmbased].
 
 # Statement of need \label{sec:need}
 
-*Persistent homology* (PH) (see e.g. [@ghrist2007barcodes; 
-@edelsbrunner2008persistent; @edelsbrunner2014persistent; 
-@oudot2015persistence; @chazal2016structure; @perea2018brief; 
-@carlsson2019persistent; @nanda2021computational] for surveys) has led to the 
-adoption of novel topological methodologies in a wide variety of computational 
-contexts, such as geometric inference 
-[@edelsbrunner2014short; @boissonnat2018geometric], signal processing 
-[@robinson2014topological; @perea2015sliding], data visualization 
-[@tierny2018topological], data analysis and machine learning 
-[@carlsson2009topology; @chazal2021introduction; @hensel2021survey]. Among the 
-invariants described by this theory, the (*persistence*) *barcode* 
-[@frosini1990shapes; @frosini1992measuring; @barannikov1994morse; 
-@robins1999approximations; @edelsbrunner2000simplification; 
-@zomorodian2005computing] has attracted the most attention due to (a) its 
-ability to track the appearance and disappearance of holes, voids, or 
-higher-dimensional topological features in data, (b) its succinct nature and 
-ease of representation, (c) its robustness under perturbations 
-[@damico2003optimal; @cohen-steiner2007stability], and (d) its amenability to 
-algorithmic optimization – see Sec. 1 in [@bauer2021ripser] for a review, and 
-the recent implementations in [@aggarwal2021dory; @vonbromssen2021computing].
+*Persistent homology* (PH) (see e.g. [@ghrist2007barcodes;
+@edelsbrunner2008persistent; @edelsbrunner2014persistent;
+@oudot2015persistence; @chazal2016structure; @perea2018brief;
+@carlsson2019persistent; @nanda2021computational] for surveys) has led to the
+adoption of novel topological methodologies in a variety of computational
+contexts, such as geometric inference [@edelsbrunner2014short;
+@boissonnat2018geometric], signal processing [@robinson2014topological;
+@perea2015sliding], data visualization [@tierny2018topological], data analysis
+and machine learning [@carlsson2009topology; @chazal2021introduction;
+@hensel2021survey]. Among the invariants described by this theory, the
+(*persistence*) *barcode* [@frosini1990shapes; @frosini1992measuring;
+@barannikov1994morse; @robins1999approximations;
+@edelsbrunner2000simplification; @zomorodian2005computing] has attracted the
+most attention due to (a) its ability to track the appearance and disappearance
+of holes, voids, or higher-dimensional topological features in data, (b) its
+succinct nature and ease of representation, (c) its robustness under
+perturbations [@damico2003optimal; @cohen-steiner2007stability], and (d) its
+amenability to algorithmic optimization – see Sec. 1 in [@bauer2021ripser] for
+a review.
 
 Despite these successes, the computation of barcodes remains a challenge when
-dealing with large datasets and/or with high-dimensional topological features. 
-Indeed, the input to any barcode computation is a growing, one-parameter family 
-of combinatorial objects, called a *filtration*, and several filtrations of 
-interest in applications become very large as their defining parameter 
-increases. This leads to a staggering number of operations required to distil 
-barcodes via established matrix reduction algorithms.
-
-This is particularly true of *Vietoris–Rips* (VR) filtrations of finite metric 
-spaces and of *flag* filtrations of weighted undirected graphs, which are the 
-object of this work.
+dealing with large datasets and/or with high-dimensional topological features.
+This is particularly true of *Vietoris–Rips* (VR) filtrations of finite metric
+spaces and, more generally, of *flag* filtrations of weighted undirected
+graphs. Our objective with *giotto-ph* is to provide a portable, comprehensive,
+easy-to-use package with state-of-the-art performance for the computations of
+these barcodes.
 
 # Related work \label{sec:related_work}
 
