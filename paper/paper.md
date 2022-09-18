@@ -54,7 +54,7 @@ and introduces novel algorithmic speedups. In this way, it establishes a new
 state of the art, surpassing even GPU-accelerated implementations when using as
 few as 5–10 CPU cores. It also allows for the retrieval of flag persistence
 generators, thus paving the way for high-performance *differentiable* VR
-barcode computations. Furthermore, it integrates a reimplementation of the
+barcode computations. Furthermore, it integrates a re-implementation of the
 *GUDHI* library's *Edge Collapser* [@boissonnat2020edge; gudhi:Collapse] as a
 pre-processing step, and includes support for weighted VR filtrations
 [@anai2020dtmbased].
@@ -85,9 +85,15 @@ Despite these successes, the computation of barcodes remains a challenge when
 dealing with large datasets and/or with high-dimensional topological features.
 This is particularly true of *Vietoris–Rips* (VR) filtrations of finite metric
 spaces and, more generally, of *flag* filtrations of weighted undirected
-graphs. Our objective with *giotto-ph* is to provide a portable, comprehensive,
-easy-to-use package with state-of-the-art performance for the computations of
-these barcodes.
+graphs. Furthermore, the efficient retrieval of the nodes and edges – called
+"flag persistence generators" in this context – corresponding to the "birth"
+and "death" of each bar in a barcode, is crucial for applications in
+differentiable machine learning and deep learning. Our aim with *giotto-ph* is
+to provide an alternative to the *Ripser.py* library [@ctralie2018ripser],
+retaining its portability and ease of use while replacing its C++ backend
+with a new parallel and higher-performance version, as well as adding new
+capabilities such as the possibility of computing flag persistence generators
+and of constructing *weighted Rips filtrations* from the user's input.
 
 # Related work \label{sec:related_work}
 
@@ -98,9 +104,8 @@ on the CPU. *Ripser* uses multiple known optimizations like *clearing*
 [@chen2011persistent] and *cohomology* [@desilva2011dualities]. Furthermore, it 
 makes use of other performance-oriented ideas, such as the implicit 
 representation of the (co)boundary and reduced (co)boundary matrices, and 
-the *emergent/apparent pairs* optimizations (we refer to [@bauer2021ripser] 
-for definitions and details). At the time of writing, the latest version of 
-*Ripser* is *v1.2.1* (release date: 22 May 2021).
+the *emergent/apparent pairs* optimizations. At the time of writing, the
+latest version of *Ripser* is *v1.2.1* (released on 22 May 2021).
 
 *Ripser* has no parallel capabilities. Overcoming this limitation is possible
 as two recent lines of work [@morozov2020towards; @zhang2020gpuaccelerated]
@@ -125,8 +130,9 @@ sequentially on the CPU.
 All implementations presented in this subsection so far (barring
 [@nigmetov2020oineus], which also provides some Python bindings) are written in
 low-level languages (C++, CUDA). *Ripser.py* [@ctralie2018ripser] contains a
-modified version of *Ripser* with support for non-zero birth times and for the 
-retrieval of cocycles, as well as a convenient Python interface.
+modified version of *Ripser* with support for non-zero diagonal entries and for
+the retrieval of representative cocycles, as well as a convenient Python
+interface.
 
 Meanwhile, in 2020, Boissonnat and Pritam presented a new algorithm they called 
 *Edge Collapser* (EC) [@boissonnat2020edge]. Independently of the code used to 
@@ -137,108 +143,58 @@ improve the end-to-end run-time for barcode computation by greatly reducing
 the complexity of the downstream matrix reduction steps (particularly in high
 homology dimensions and/or with large datasets). A first implementation
 [@gudhi:Collapse] of EC was integrated into the *GUDHI* library [@gudhi:urm]
-and we reimplemented it as part of *giotto-ph*. Note, however, that the *GUDHI*
+and we re-implemented it as part of *giotto-ph*. Note, however, that the *GUDHI*
 team have since greatly improved on their first version by using new techniques
 [@glisse2022edge].
 
 # Our contribution
 
-In this context, we present 
-[*giotto-ph*](https://github.com/giotto-ai/giotto-ph), a Python package built 
-on top of a C++ backend that computes PH barcodes for VR filtrations on the CPU. 
-To the best of our knowledge, this is the first package fully integrating the 
-three ideas described in 
-\hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}} (lock-free 
-reduction, parallelized search for apparent pairs, edge collapses) in a single 
-portable, easy-to-use library. We remark that, after the release of our code 
-and of the first version of this paper, we learned about a very recent thesis 
-[@tulchinskii2021fast] and associated 
+Given a dense or sparse matrix (with possibly non-zero diagonal entries as in
+[@ctralie2018ripser]), [*giotto-ph*](https://github.com/giotto-ai/giotto-ph)'s
+main C++ backend computes the barcode of its VR or flag filtration in parallel
+on the CPU. To the best of our knowledge, this is the first package fully
+integrating the two ideas for parallelization described in
+\hyperref[sec:related_work]{``Related work"\ref*{sec:related_work}} – namely,
+lock-free reduction [@morozov2020towards] and parallelized search for apparent
+pairs [@zhang2020gpuaccelerated] – in a single, portable, easy-to-use library.
+Relative to the prototype implementation [@morozov2020lock] of the ideas in
+[@morozov2020towards], we improved execution speed and resource usage by
+implementing custom lock-free hash tables and a thread pool. Furthermore,
+we introduced a novel algorithmic improvement to the routine for retrieving
+the maximum vertex of a 1-simplex from its integer index (in a combinatorial
+number system as in *Ripser* [@bauer2021ripser]). After the release of our code
+and of the first version of this paper, we learned about a thesis
+[@tulchinskii2021fast] and associated
 [publicly available code](https://github.com/ArGintum/PersistenceHomology)
-(retrieved 1 August 2021) in which a very similar program to ours has been 
-carried out, though the apparent pairs optimization and support for coefficients 
-in finite prime fields other than $\mathbb{F}_2$ are among the features still 
-missing from that package.
+in which a similar program has been carried out, though the apparent pairs
+optimization and support for coefficients in finite prime fields other than
+$\mathbb{F}_2$ are among the features still missing from that package.
 
-When developing *giotto-ph* we focused on increasing execution speed throughout. 
-In particular:
+*giotto-ph*'s is the first *Ripser*-derived C++ backend to include the
+possibility of retrieving flag persistence generators during the computation
+of a barcode. It also inherits from *Ripser.py* [@ctralie2018ripser] the
+possibility of returning representative cocycles.
 
-  1. We built on the ideas for parallel reduction presented in 
-     [@morozov2020towards] and on the prototype implementation described in 
-     [@morozov2020lock], and improved execution speed and resource usage by 
-     implementing custom lock-free hash tables and a thread pool.
-  2. Similarly to *Ripser++*, we implemented a parallel version of the 
-     apparent pairs optimization, thus far only present in serial form in 
-     *Ripser v1.2*.
-  3. We re-implemented the EC algorithm to increase its execution speed 
-     compared to [@gudhi:Collapse]. The simple observation that the 
-     well-known *enclosing radius* optimization is applicable to EC is shown 
-     here to lead to even larger improvements.
+A re-implementation of *GUDHI*'s initial EC algorithm [@gudhi:Collapse] is also
+included in the C++ source code.
 
-Our results show that our code is often $1.5$ to $2$ times (and, in one example, 
-almost $8$ times) faster than [@morozov2020towards] and able to beat 
-*Ripser++* [@zhang2020gpuaccelerated], the current state-of-the-art GPU 
+Our results show that our code is often $1.5$ to $2$ times (and, in one
+example, almost $8$ times) faster than [@morozov2020towards] and able to beat
+*Ripser++* [@zhang2020gpuaccelerated], the current state-of-the-art GPU
 implementation, while running only on CPU and with as few as 5–10 cores.
 
-Finally, *giotto-ph* owes some architectural decisions to *Ripser.py* 
-[@ctralie2018ripser] – in particular, the support for node weights. At the 
-level of the Python interface, our main contribution is supporting *weighted 
-Rips filtrations* – in particular, the *distance-to-measure*–based filtrations 
-described in [@anai2020dtmbased].
-
-Thanks to its reduced memory usage and shorter run-times, we hope that 
-*giotto-ph* will enable researchers to explore larger datasets, and in higher 
-homology dimensions, than ever before.
-
-# Implementation
+*giotto-ph* is chiefly meant for use as a Python package, available from the
+Python Package Index (PyPI). At the level of the Python interface (which is
+inspired by *Ripser.py* [@ctralie2018ripser]), our novel contributions are:
+a) linking an EC backend with a *Ripser*-derived backend; b) supporting
+*weighted Rips filtrations* – in particular, the *distance-to-measure*–based
+filtrations described in [@anai2020dtmbased].
 
 ![*giotto-ph* consists of a C++ backend and a Python frontend. 
 The Python interface is based on *Ripser.py* [@ctralie2018ripser] (see 
 \hyperref[sec:python]{``Python interface"\ref*{sec:python}} for details). The 
 figure also shows the inheritance of *giotto-ph*'s C++ backend from pre-dating 
 implementations. \label{fig:lib}](architecture_bpj.svg){width=100%}
-
-Our aim with *giotto-ph* is to provide an alternative to the excellent *Ripser.py* library,
-retaining several of the latter's advantages, namely portability and ease of
-use, while replacing the C++ backend with a new parallel and higher-performance
-version.
-
-## C++ backend \label{sec:Cpp_backend}
-
-The implementation of *giotto-ph*'s backend parallel algorithm is heavily 
-inspired by [@morozov2020lock], a functional proof of concept of 
-[@morozov2020towards]. Starting from [@morozov2020towards], we replaced the 
-main data structure and the threading strategy to minimize the overhead 
-introduced by adding parallelism. Furthermore, we introduced the apparent 
-pairs approach, in its parallel form, to harvest its benefits in shortening 
-run-times: a decreased number of columns to reduce [@bauer2021ripser] and an 
-additional early stop condition when enumerating cofacets.
-
-The final component in our C++ backend is a rewriting of the EC algorithm,
-implemented so far only in the *GUDHI* library [@gudhi:Collapse]. Our 
-implementation focuses on performance and adds support to
-weighted graphs with arbitrary (possibly non-positive) edge weights as well as 
-arbitrary node weights.
-
-## Python interface \label{sec:python}
-
-Our Python interface is based on *Ripser.py* [@ctralie2018ripser]. While it 
-lacks some of *Ripser.py*'s features, such as the support for "greedy 
-permutations", it introduces the following improvements:
-
-  - Support for Edge Collapser. EC is disabled by default, but users can easily 
-    enable it by means of the `collapse_edges` optional argument.
-
-  - Support for enclosing radius. The *(minimum) enclosing radius* of a 
-    finite metric space is the radius of the smallest enclosing ball of that 
-    space. Simplices with higher filtration values than the enclosing radius 
-    can be safely omitted without changing the final barcode.
-
-  - Weighted VR filtrations. Distance-to-measure (DTM) based filtrations 
-    [@anai2020dtmbased] address re-weight vertices and distances according to 
-    the local neighbourhood structure, to yield a barcode which is more robust 
-    to statistical outliers. The user can toggle DTM-based reweighting (or 
-    more general reweightings) by setting the optional parameters `weights` and
-  `weight_params`.
 
 # Experimental results \label{sec:experiments}
 
