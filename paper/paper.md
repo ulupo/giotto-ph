@@ -190,8 +190,8 @@ a) linking an EC backend with a *Ripser*-derived backend; b) supporting
 *weighted Rips filtrations* – in particular, the *distance-to-measure*–based
 filtrations described in [@anai2020dtmbased].
 
-![*giotto-ph* consists of a C++ backend and a Python frontend. 
-The Python interface is based on *Ripser.py* [@ctralie2018ripser] (see 
+![*giotto-ph* consists of a C++ backend and a Python frontend. The Python
+interface is based on *Ripser.py* [@ctralie2018ripser] (see 
 \hyperref[sec:python]{``Python interface"\ref*{sec:python}} for details). The 
 figure also shows the inheritance of *giotto-ph*'s C++ backend from pre-dating 
 implementations. \label{fig:lib}](architecture_bpj.svg){width=100%}
@@ -202,15 +202,11 @@ All experiments presented in this paper were performed on a machine running
 Linux CentOS 7.9.2009 with kernel 5.4.92, equipped with two Intel® XEON® 
 Gold 6248R (24 physical cores each) and a total of 128 GB of RAM. 
 
-We present measures on the datasets of \autoref{tbl:datasets} because they 
-are publicly available, and they are used in publications [@Otter_2017; 
-@bauer2021ripser] describing established algorithms, making them a 
-representative benchmark set and facilitating comparisons among competing 
-solutions. All datasets are stored as point clouds. When the `threshold` 
-parameter is empty, the tests report run-times with the enclosing radius 
-option active. The `dim` parameter corresponds to the maximum dimension for 
-which we compute PH, and the `coeff` parameter corresponds to the prime 
-field of coefficients (in our tests, this is always $\mathbb{F}_2$).
+We tested our software on the publicly available datasets described in
+\autoref{tbl:datasets}, which have been used in previous publications
+[@Otter_2017; @bauer2021ripser]. All datasets are stored as point clouds. In
+each case, we compute mod-2 PH barcodes up to and including the maximum
+homology dimension `dim`.
 
 \begin{table}
 \centering
@@ -219,14 +215,14 @@ the dataset.}
 \label{tbl:datasets}
 \begin{tabular}{lrrrr}
     \hline
-    \textbf{dataset} & \textbf{size} & \textbf{threshold} & \textbf{dim} & \textbf{coeff} \\ \hline
-    \texttt{sphere3}  & 192   &      & 2 & 2 \\ \hline
-    \texttt{dragon}   & 2000  &      & 1 & 2 \\ \hline
-    \texttt{o3\_1024} & 1024  & 1.8  & 3 & 2 \\ \hline
-    \texttt{random16} & 50    &      & 7 & 2 \\ \hline
-    \texttt{fractal}  & 512   &      & 2 & 2 \\ \hline
-    \texttt{o3\_4096} & 4096  & 1.4  & 3 & 2 \\ \hline
-    \texttt{torus4}   & 50000 & 0.15 & 2 & 2 \\
+    \textbf{dataset} & \textbf{size} & \textbf{threshold} & \textbf{dim} \\ \hline
+    \texttt{sphere3}  & 192   &      & 2 \\ \hline
+    \texttt{dragon}   & 2000  &      & 1 \\ \hline
+    \texttt{o3\_1024} & 1024  & 1.8  & 3 \\ \hline
+    \texttt{random16} & 50    &      & 7 \\ \hline
+    \texttt{fractal}  & 512   &      & 2 \\ \hline
+    \texttt{o3\_4096} & 4096  & 1.4  & 3 \\ \hline
+    \texttt{torus4}   & 50000 & 0.15 & 2 \\
     \hline
 \end{tabular}
 \end{table}
