@@ -198,15 +198,15 @@ implementations. \label{fig:lib}](architecture_bpj.svg){width=100%}
 
 # Experimental results \label{sec:experiments}
 
-All experiments presented in this paper were performed on a machine running 
-Linux CentOS 7.9.2009 with kernel 5.4.92, equipped with two Intel® XEON® 
-Gold 6248R (24 physical cores each) and a total of 128 GB of RAM. 
+All our experiments were performed on a machine running Linux CentOS 7.9.2009
+with kernel 5.4.92, equipped with two Intel® XEON® Gold 6248R (24 physical
+cores each) and a total of 128 GB of RAM.
 
 We tested our software on the publicly available datasets described in
 \autoref{tbl:datasets}, which have been used in previous publications
 [@Otter_2017; @bauer2021ripser]. All datasets are stored as point clouds. In
 each case, we compute mod-2 PH barcodes up to and including the maximum
-homology dimension `dim`.
+homology dimension **dim**.
 
 \begin{table}
 \centering
@@ -227,17 +227,11 @@ the dataset.}
 \end{tabular}
 \end{table}
 
-## Comparison with state-of-the-art algorithms
+## Comparison with the state of the art
 
-In this section we compare our implementation with other implementations of 
-PH for VR filtrations that use an approach similar to Ripser. We do not 
-directly compare with other existing libraries which adopt different 
-approaches, like *GUDHI* [@gudhi:urm] and *Eirene* [@henselmanghristl6], 
-because from [@bauer2021ripser] it is evident that *Ripser* is always faster. 
-
-\autoref{fig:gph_vs_ripser_1.2} compares the *giotto-ph* backend and 
-*Ripser v1.2*. When the computation of the filtration is very fast, due to the 
-reduced number of points or the low dimension of the computation, there is 
+\autoref{fig:gph_vs_ripser_1.2} compares the *giotto-ph* backend and
+*Ripser v1.2.1*. When the computation of the filtration is very fast, due to
+the reduced number of points or the low dimension of the computation, there is 
 marginal or no benefit in adopting our parallel approach.
 
 ![Speed-up of *giotto-ph* compared to *Ripser v1.2*. *giotto-ph* is always 
@@ -248,25 +242,24 @@ only up to dimension $1$ and the cost of setting up the parallel element of
 the library is non-zero.
 \label{fig:gph_vs_ripser_1.2}](giotto_vs_ripser1.2.svg){width=80%}
 
-According to our measurements reported in Figure \autoref{fig:moro}, our 
-implementation outperforms Morozov and Nigmetov's proof-of-concept 
-implementation [@morozov2020lock] in most cases, and most noticeably when 
-the number of parallel resources increases. The only exception when using 
-multiple threads is `sphere3`. The version in [@morozov2020lock] performs 
-better and better on `sphere3` when increasing the number of parallel 
-resources, while ours does not. The main culprit is
-that, while in [@morozov2020lock] parallel resources are allocated only when 
-needed in the computation, our thread pool will allocate
-all the parallel resources indicated by the user ahead of time. Our approach is 
-most beneficial when the allocated resources can be reused during the 
-computation, and this is true e.g. when computing homology dimensions in degree
-$2$ and above. However, when computing only up to dimension $1$, it is only 
-necessary to allocate the parallel resources once, and an on-the-fly approach 
-such as the one in [@morozov2020lock] can be faster. Another logically 
-independent reason for this observed performance loss has to do with apparent 
-pairs: we remind the reader that the implementation in [@morozov2020lock] is 
-based upon *Ripser v1.1* which, unlike *Ripser v1.2* considered here, did not 
-make use of the apparent pairs optimization. While the search for apparent 
+According to our measurements reported in Figure \autoref{fig:moro}, our
+implementation outperforms Morozov and Nigmetov's proof-of-concept
+implementation [@morozov2020lock] in most cases, and most noticeably when the
+number of parallel resources increases. The only exception when using multiple
+threads is `sphere3`. The version in [@morozov2020lock] performs better and
+better on `sphere3` when increasing the number of parallel resources, while
+ours does not. The main culprit is that, while in [@morozov2020lock] parallel
+resources are allocated only when needed in the computation, our thread pool
+will allocate all the parallel resources indicated by the user ahead of time.
+Our approach is most beneficial when the allocated resources can be reused
+during the computation, and this is true e.g. when computing homology
+dimensions in degree $2$ and above. However, when computing only up to
+dimension $1$, it is only necessary to allocate the parallel resources once,
+and an on-the-fly approach such as the one in [@morozov2020lock] can be faster. Another logically 
+independent reason for this observed performance loss has to do with apparent
+pairs: we remind the reader that the implementation in [@morozov2020lock] is
+based upon *Ripser v1.1* which, unlike *Ripser v1.2* considered here, did not
+make use of the apparent pairs optimization. While the search for apparent
 pairs and subsequent column assembly step is performed in parallel in homology 
 dimension $1$ or higher, it is only done serially in dimension $0$.
 
@@ -278,22 +271,22 @@ in this specific dataset. On the other hand, performance on `sphere3` is
 worse as explained in the main body of text.
 \label{fig:moro}](giotto_vs_lf.svg){width=80%}
 
-Considering the good performance obtained, we decided to compare our 
-implementation with the state-of-the-art parallel code running on GPU: 
-*Ripser++* [@zhang2020gpuaccelerated]. For this test, we ran our code on the 
-same datasets used in [@zhang2020gpuaccelerated] (for full details check 
-Table 2 on page 23 of [@zhang2020gpuaccelerated]) and compared our run-times 
-with the reported figures. \autoref{fig:comparison_gph_rpp} shows that on our 
-test machine, we achieve better performance when using only 4 to 10 threads, 
-depending on the dataset, confirming that a relatively new CPU with at least 8 
+Considering the good performance obtained, we decided to compare our
+implementation with the state-of-the-art parallel code running on GPU:
+*Ripser++* [@zhang2020gpuaccelerated]. For this test, we ran our code on the
+same datasets used in [@zhang2020gpuaccelerated] (for full details check
+Table 2 on page 23 of [@zhang2020gpuaccelerated]) and compared our run-times
+with the reported figures. \autoref{fig:comparison_gph_rpp} shows that on our
+test machine, we achieve better performance when using only 4 to 10 threads,
+depending on the dataset, confirming that a relatively new CPU with at least 8
 cores should be able to beat a high-end GPU on this computation. 
 
-There are multiple limitations in *Ripser++* that were addressed in 
-*giotto-ph*. First, *Ripser++* does not perform the matrix reduction in 
-parallel. Second, apparent pairs are stored in a sorted array in order to 
-provide apparent pair lookups in $\mathcal{O}(\log{}n)$ time using binary 
-searches. Since it is possible to carry out the matrix reduction without 
-recording and/or sorting apparent pairs, *giotto-ph* results in a 
+There are multiple limitations in *Ripser++* that were addressed in
+*giotto-ph*. First, *Ripser++* does not perform the matrix reduction in
+parallel. Second, apparent pairs are stored in a sorted array in order to
+provide apparent pair lookups in $\mathcal{O}(\log{}n)$ time using binary
+searches. Since it is possible to carry out the matrix reduction without
+recording and/or sorting apparent pairs, *giotto-ph* results in a
 competitive solution, even if running on less high-performance hardware.
 
 ![Run times comparison of *giotto-ph* (full blue line) and *Ripser++* 
